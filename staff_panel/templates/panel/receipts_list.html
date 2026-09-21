@@ -1,0 +1,70 @@
+{% extends "panel/base.html" %}
+{% load panel_extras %}
+
+{% block title %}Чеки{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Чеки</h1>
+      <p class="panel-muted">Всего: {{ page_obj.paginator.count }}</p>
+    </div>
+    <a href="{% url 'panel:receipts_export' %}?{{ request.GET.urlencode }}" class="panel-btn panel-btn--ghost">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+        <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Скачать Excel
+    </a>
+  </div>
+
+  {% include "panel/filters.html" %}
+
+  <div class="panel-table-wrap">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th class="panel-col-num panel-cell--num">№</th>
+          {% include "panel/sort_th.html" with col=sort_context.created_at label="Дата загрузки" %}
+          {% include "panel/sort_th.html" with col=sort_context.participant label="Участник" %}
+          {% include "panel/sort_th.html" with col=sort_context.status label="Статус" %}
+          <th>Способ ввода</th>
+          {% include "panel/sort_th.html" with col=sort_context.amount label="Сумма, ₽" align="right" %}
+          <th class="panel-cell--num">Сумма продукции ОБ, ₽</th>
+          {% include "panel/sort_th.html" with col=sort_context.store label="Магазин" %}
+          <th>Город</th>
+          {% include "panel/sort_th.html" with col=sort_context.date label="Дата покупки" %}
+          <th class="panel-cell--center">Фото</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for receipt in receipts %}
+        <tr class="panel-table-row--clickable" data-url="{% url 'panel:receipt_detail' receipt.pk %}">
+          <td class="panel-col-num panel-cell--num panel-muted">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+          <td class="panel-nowrap">{{ receipt.created_at|date:"d.m.Y H:i" }}</td>
+          <td>
+            {{ receipt.participant|display_name:is_masked_user }}
+            <div class="panel-email-row"><span class="panel-muted">{{ receipt.participant.email|display_email:is_masked_user }}</span></div>
+          </td>
+          <td><span class="panel-badge panel-badge--{{ receipt.status }}">{{ receipt.get_status_display }}</span></td>
+          <td>{% if receipt.input_method %}{{ receipt.get_input_method_display }}{% else %}—{% endif %}</td>
+          <td class="panel-cell--num">{% if receipt.amount %}{{ receipt.amount }}{% else %}—{% endif %}</td>
+          <td class="panel-cell--num">{% if receipt.promo_total %}{{ receipt.promo_total }}{% else %}—{% endif %}</td>
+          <td>{{ receipt.store|default:"—" }}</td>
+          <td>{{ receipt.participant.city|default:"—" }}</td>
+          <td class="panel-nowrap">{% if receipt.date %}{{ receipt.date|date:"d.m.Y H:i" }}{% else %}—{% endif %}</td>
+          <td class="panel-col-photo panel-cell--center">{% if receipt.receipt_image %}<span class="panel-photo-check" title="Есть фото">✓</span>{% else %}<span class="panel-muted">—</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="11" class="panel-empty">Чеки не найдены</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "panel/pagination.html" %}
+  </div>
+</section>
+{% endblock %}
+
+{% block modal_root %}
+<div id="panel-modal-root" data-initial-url="{{ open_modal_url }}"></div>
+{% endblock %}

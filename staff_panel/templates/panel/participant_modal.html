@@ -1,0 +1,178 @@
+{% load panel_extras %}
+<div class="panel-modal__header">
+  <div class="panel-modal__header-row">
+    <div class="panel-modal__avatar">{{ participant.last_name|first|upper }}</div>
+    <div class="panel-modal__identity">
+      <h2 class="panel-modal__title">{{ participant|display_name:is_masked_user }}</h2>
+      <span class="panel-muted">{{ participant.email|display_email:is_masked_user }}</span>
+    </div>
+    <button class="panel-modal__close" id="panel-modal-close" type="button" title="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="panel-modal__body">
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Данные участника</div>
+    <dl class="panel-modal__dl">
+      <dt>Отчество</dt><dd>{{ participant.middle_name|default:"—" }}</dd>
+      <dt>Телефон</dt><dd>{% if participant.phone %}{{ participant.phone|display_phone:is_masked_user }}{% else %}—{% endif %}</dd>
+      <dt>Город</dt><dd>{{ participant.city|default:"—" }}</dd>
+      <dt>Адрес</dt><dd>{{ participant.address|default:"—" }}</dd>
+      <dt>Дата рождения</dt><dd>{{ participant.birth_date|date:"d-m-Y"|default:"—" }}</dd>
+      <dt>Дата регистрации</dt><dd>{{ participant.created_at|date:"d.m.Y H:i"|default:"—" }}</dd>
+      <dt>Банк</dt><dd>{{ participant.bank|default:"—" }}</dd>
+      <dt>Подписка на email о статусе чека</dt><dd>{{ participant.is_subscribed_receipt_emails|yesno:"да,нет" }}</dd>
+      <dt>Гарантированный приз отправлен</dt><dd>{{ participant.is_guaranteed_prize_sent|yesno:"да,нет" }}</dd>
+      <dt>Статус участия</dt><dd>{{ participant_status }}</dd>
+      <dt>Заблокирован</dt><dd>{{ participant.is_blocked|yesno:"да,нет" }}</dd>
+    </dl>
+  </div>
+
+  {% comment %}Выплата гарантированного приза 50₽ — этап и отказ участника видны
+  здесь же, чтобы не искать ту же запись в разделе Cyclops.{% endcomment %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Гарантированный приз (50 ₽)</div>
+    <dl class="panel-modal__dl">
+      <dt>Отказ от выплаты</dt>
+      <dd>
+        {% if participant.guaranteed_prize_opt_out %}
+          <span class="panel-badge panel-badge--rejected">да — выплаты не отправляются</span>
+        {% else %}нет{% endif %}
+      </dd>
+      {% if payout %}
+        <dt>Состояние выплаты</dt>
+        <dd{% if payout.stage_hint %} title="{{ payout.stage_hint }}"{% endif %}>{{ payout.stage_label }}</dd>
+        <dt>Попыток отправки</dt><dd>{{ payout.cnt_retry }}</dd>
+        {% if payout.error_reason %}<dt>Причина ошибки</dt><dd>{{ payout.error_reason }}</dd>{% endif %}
+        <dt>Выплачена</dt><dd>{{ payout.paid_at|date:"d.m.Y H:i"|default:"—" }}</dd>
+      {% else %}
+        <dt>Состояние выплаты</dt><dd>выплата ещё не заведена</dd>
+      {% endif %}
+    </dl>
+  </div>
+  {% if not is_read_only_staff %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Редактирование</div>
+    <form method="post" action="{% url 'panel:participant_update' participant.pk %}">
+      {% csrf_token %}
+      {% comment %}Карточку открывают не только из списка участников (например, из
+      раздела Cyclops по email в таблице выплат) — сюда же и возвращаемся после
+      сохранения, чтобы не выбрасывать из раздела, в котором работали.{% endcomment %}
+      {% if return_to %}<input type="hidden" name="return_to" value="{{ return_to }}">{% endif %}
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_first_name">Имя</label>
+        <input class="panel-field__input" type="text" id="id_first_name" name="first_name" value="{{ participant.first_name }}">
+      </div>
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_last_name">Фамилия</label>
+        <input class="panel-field__input" type="text" id="id_last_name" name="last_name" value="{{ participant.last_name }}">
+      </div>
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_middle_name">Отчество</label>
+        <input class="panel-field__input" type="text" id="id_middle_name" name="middle_name" value="{{ participant.middle_name|default:'' }}">
+      </div>
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_phone">Телефон</label>
+        <input class="panel-field__input" type="text" id="id_phone" name="phone" value="{{ participant.phone|default:'' }}">
+      </div>
+      <div class="panel-field panel-field--city-autocomplete">
+        <label class="panel-field__label" for="id_city">Город</label>
+        <input class="panel-field__input" type="text" id="id_city" name="city" value="{{ participant.city|default:'' }}" autocomplete="off" data-dadata-token="{{ dadata_token|default:'' }}">
+        <div class="panel-city-suggestions" id="panel-city-suggestions"></div>
+        <p class="panel-field__hint panel-field__hint--error" id="panel-city-field-error" hidden></p>
+      </div>
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_address">Адрес</label>
+        <input class="panel-field__input" type="text" id="id_address" name="address" value="{{ participant.address|default:'' }}">
+      </div>
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_birth_date">Дата рождения</label>
+        <input class="panel-field__input" type="text" id="id_birth_date" name="birth_date" value="{{ participant.birth_date|date:'d-m-Y' }}" placeholder="ДД-ММ-ГГГГ" autocomplete="off">
+      </div>
+      <div class="panel-filter-panel__checkbox-group">
+        <label class="panel-filter-panel__checkbox">
+          <input type="checkbox" name="is_active" {% if participant.is_active %}checked{% endif %}>
+          <span class="panel-filter-panel__checkbox-mark"></span>
+          <span class="panel-filter-panel__checkbox-label">Активен</span>
+        </label>
+        <label class="panel-filter-panel__checkbox">
+          <input type="checkbox" name="is_blocked" {% if participant.is_blocked %}checked{% endif %}>
+          <span class="panel-filter-panel__checkbox-mark"></span>
+          <span class="panel-filter-panel__checkbox-label">Заблокирован (не может загружать чеки)</span>
+        </label>
+        <label class="panel-filter-panel__checkbox">
+          <input type="checkbox" name="guaranteed_prize_opt_out" {% if participant.guaranteed_prize_opt_out %}checked{% endif %}>
+          <span class="panel-filter-panel__checkbox-mark"></span>
+          <span class="panel-filter-panel__checkbox-label">Отказ от гарантированного приза (выплата 50 ₽ не отправляется)</span>
+        </label>
+      </div>
+      <p class="panel-field__hint">
+        Галочка «Отказ от гарантированного приза» — для участников, которые сами отказались от выплаты.
+        Пока она стоит, приз не уйдёт ни плановой выплатой в пятницу, ни авто-повтором, ни кнопкой
+        «Оплатить» в разделе Cyclops. Снимите её — и выплата продолжится с того же места.
+      </p>
+      <div class="panel-form-actions">
+        <button type="submit" class="panel-btn">Сохранить</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Статистика чеков</div>
+    <div class="panel-modal__stats">
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val">{{ receipts_stats.total }}</span>
+        <span class="panel-modal__stat-label">Всего</span>
+      </div>
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val" style="color:#37CD1A">{{ receipts_stats.confirmed }}</span>
+        <span class="panel-modal__stat-label">Принято</span>
+      </div>
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val" style="color:#8b90a5">{{ receipts_stats.pending }}</span>
+        <span class="panel-modal__stat-label">На проверке</span>
+      </div>
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val" style="color:#ef4444">{{ receipts_stats.rejected }}</span>
+        <span class="panel-modal__stat-label">Отклонено</span>
+      </div>
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val" style="color:var(--accent)">{{ receipts_stats.winner }}</span>
+        <span class="panel-modal__stat-label">Победные</span>
+      </div>
+      <div class="panel-modal__stat">
+        <span class="panel-modal__stat-val" style="color:#3b82f6">{{ receipts_stats.frozen }}</span>
+        <span class="panel-modal__stat-label">Заморожено</span>
+      </div>
+    </div>
+  </div>
+
+  {% if receipts %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Чеки участника ({{ receipts|length }})</div>
+    <div class="panel-modal__table-wrap">
+      <table class="panel-table panel-modal__table">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Сумма</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receipt in receipts %}
+          <tr class="panel-table-row--navigate" data-url="{% url 'panel:receipts' %}?open={{ receipt.pk }}">
+            <td>{{ receipt.created_at|date:"d.m.Y" }}</td>
+            <td><span class="panel-badge panel-badge--{{ receipt.status }}">{{ receipt.get_status_display }}</span></td>
+            <td>{% if receipt.amount %}{{ receipt.amount }} ₽{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>

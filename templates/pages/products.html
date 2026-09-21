@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="section__title">Товары-участники акции</h1>
+        <p class="section__subtitle">Полный перечень товаров «{{ company_info.brand_name }}», участвующих в акции</p>
+
+        {% if action_products %}
+        <ul class="product-grid">
+            {% for product in action_products %}{% include 'partials/sections/product_card.html' with product=product %}{% endfor %}
+        </ul>
+        {% else %}
+        <p class="section__note">Список товаров скоро появится.</p>
+        {% endif %}
+
+        {% if company_info.products_list %}
+        <div class="section__actions">
+            <a class="button button--ghost" href="{{ company_info.products_list.url }}" target="_blank" rel="noopener">Скачать перечень файлом</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% include 'partials/sections/faq.html' %}
+{% endblock %}

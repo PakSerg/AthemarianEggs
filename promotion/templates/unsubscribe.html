@@ -1,0 +1,26 @@
+{% extends 'base_promotion.html' %}
+{% load static %}
+
+{% block title %}{{ company_info.brand_name }} | Отписка от рассылки{% endblock %}
+
+{% block content %}
+<section style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding:60px 20px;">
+    <div style="max-width:540px;width:100%;text-align:center;">
+        {% if success %}
+            <h1 style="margin-bottom:16px;">Вы отписались</h1>
+            <p style="opacity:0.7;margin-bottom:32px;">
+                Вы больше не будете получать письма о статусе чека.<br>
+                Остальные письма (о победе, договоре) по-прежнему будут приходить.
+            </p>
+            <a href="{% url 'promotion:dashboard' %}" class="btn-primary">Перейти в личный кабинет</a>
+        {% elif error %}
+            <h1 style="margin-bottom:16px;">Ссылка недействительна</h1>
+            <p style="opacity:0.7;margin-bottom:32px;">
+                Ссылка для отписки устарела или повреждена.<br>
+                Попробуйте перейти по ссылке из последнего письма.
+            </p>
+            <a href="{% url 'promotion:dashboard' %}" class="btn-primary">Перейти в личный кабинет</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

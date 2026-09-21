@@ -1,0 +1,148 @@
+{% load panel_extras %}
+<div class="panel-modal__header">
+  <div class="panel-modal__header-row">
+    <div class="panel-modal__avatar">{{ row.participant.last_name|first|upper }}</div>
+    <div class="panel-modal__identity">
+      <h2 class="panel-modal__title">{{ row.participant|display_name:is_masked_user }}</h2>
+      <span class="panel-muted">
+        {{ row.kind_label }}{% if row.month_num %}, месяц {{ row.month_num }}{% elif row.week_num %}, неделя {{ row.week_num }}{% endif %}
+        {% if row.receipt %} · <a href="{% url 'panel:receipts' %}?open={{ row.receipt.pk }}">Чек #{{ row.receipt.pk }}</a>{% endif %}
+      </span>
+    </div>
+    <button class="panel-modal__close" id="panel-modal-close" type="button" title="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="panel-modal__body">
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Победитель</div>
+    <dl class="panel-modal__dl">
+      <dt>Email</dt><dd>{{ row.participant.email|display_email:is_masked_user|default:"—" }}</dd>
+      <dt>Телефон</dt><dd>{% if row.phone %}{{ row.phone|display_phone:is_masked_user }}{% else %}—{% endif %}</dd>
+      <dt>Город и адрес</dt><dd>{{ row.city_address|default:"—" }}</dd>
+      <dt>Этап</dt><dd><span class="panel-badge panel-badge--{{ row.stage_color }}">{{ row.stage_label }}</span></dd>
+    </dl>
+  </div>
+
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Приз</div>
+    <dl class="panel-modal__dl">
+      <dt>Название</dt><dd>{{ row.prize.name|default:"—" }}</dd>
+      <dt>Тип</dt><dd>{{ row.prize.type_prize|default:"—" }}</dd>
+      <dt>Стоимость</dt><dd>{% if row.prize.cost != None %}{{ row.prize.cost }} ₽{% else %}—{% endif %}</dd>
+      <dt>НДФЛ</dt><dd>{% if row.prize.ndfl %}{{ row.prize.ndfl }} ₽{% else %}—{% endif %}</dd>
+    </dl>
+    {% if delete_url or replace_url or replace_block_reason %}
+    <div class="panel-modal__actions">
+      {% if replace_url %}
+      <button type="button" class="panel-btn panel-btn--small panel-open-modal-btn" data-url="{{ replace_url }}">Заменить победителя</button>
+      {% elif replace_block_reason %}
+      <span class="panel-muted" title="{{ replace_block_reason }}">Заменить победителя нельзя: {{ replace_block_reason }}</span>
+      {% endif %}
+      {% if delete_url %}
+      <form method="post" action="{{ delete_url }}" data-panel-confirm="Удалить итог розыгрыша? Это действие необратимо.">
+        {% csrf_token %}
+        <button type="submit" class="panel-btn panel-btn--small panel-btn--danger">Удалить итог розыгрыша</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if template_plan %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">
+      {% if row.is_contract_issued %}Договор{% else %}Договор, который будет создан{% endif %}
+    </div>
+    <p class="panel-modal__hint">
+      Шаблон выбирается автоматически по призу — вручную его указывать не нужно.
+      Категория этого приза: <strong>{{ template_plan.kind_label }}</strong>.
+    </p>
+
+    {% if template_plan.error %}
+    <p class="panel-wwf-error">⚠ {{ template_plan.error }}</p>
+    {% endif %}
+
+    <dl class="panel-modal__dl">
+      <dt>Шаблон</dt>
+      <dd>
+        {% if template_plan.template %}
+          {{ template_plan.template_name }}
+          {% if template_plan.template_url %}
+          <a href="{{ template_plan.template_url }}" target="_blank" rel="noopener" class="panel-modal__ext-link">открыть шаблон ↗</a>
+          {% endif %}
+        {% else %}—{% endif %}
+      </dd>
+      <dt>ID шаблона в OkiDoki</dt><dd><code>{{ template_plan.template_id|default:"—" }}</code></dd>
+      <dt>External ID договора</dt><dd><code>{{ template_plan.external_id|default:"—" }}</code></dd>
+      {% if row.contract_link %}
+      <dt>Ссылка на договор</dt>
+      <dd><a href="{{ row.contract_link }}" target="_blank" rel="noopener">{{ row.contract_link }}</a></dd>
+      {% endif %}
+      {% if row.status_oki_document %}
+      <dt>Статус</dt><dd><span class="panel-badge panel-badge--{{ row.contract_status_class }}">{{ row.status_oki_document }}</span></dd>
+      {% endif %}
+      {% if row.contract_issued_at %}
+      <dt>Выставлен</dt><dd>{{ row.contract_issued_at|date:"d.m.Y H:i" }}</dd>
+      {% endif %}
+      {% if row.email_sent_at %}
+      <dt>Письмо отправлено</dt><dd>{{ row.email_sent_at|date:"d.m.Y H:i" }}</dd>
+      {% endif %}
+    </dl>
+
+    <div class="panel-modal__section-subtitle">Поля, которые подставятся в договор</div>
+    <table class="panel-table panel-modal__table panel-modal__table--fields">
+      <thead>
+        <tr><th>Поле в шаблоне</th><th>Значение</th></tr>
+      </thead>
+      <tbody>
+        {% for item in template_plan.system_entities %}
+        <tr>
+          <td><code>{{ item.keyword }}</code><span class="panel-cell-meta">{{ item.label }}</span></td>
+          <td>{% if item.value %}{{ item.value }}{% else %}<span class="panel-wwf-error">не заполнено</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+        {% for item in template_plan.entities %}
+        <tr>
+          <td><code>{{ item.keyword }}</code></td>
+          <td>{% if item.value %}{{ item.value }}{% else %}<span class="panel-wwf-error">не заполнено</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        {% if not template_plan.system_entities %}
+        <tr><td colspan="2" class="panel-empty">У победителя не указан приз — поля договора рассчитать нельзя.</td></tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if row.public_participant %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Замена победителя</div>
+    <p class="panel-wr-alert">
+      На лендинге в блоке «Победители» показан
+      <strong>{{ row.public_participant|display_name:is_masked_user }}</strong> —
+      победитель, объявленный изначально. Замены в дашборде опубликованные итоги не меняют.
+    </p>
+  </div>
+  {% endif %}
+
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Оформление победителя</div>
+    {% if fulfillment_panel_html %}
+      {{ fulfillment_panel_html }}
+    {% else %}
+      <p class="panel-muted">Нет данных для оформления победителя (не привязан чек).</p>
+    {% endif %}
+  </div>
+
+  {% if replacement_history %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">История замен</div>
+    {% include "panel/winner_replacement_history.html" with history=replacement_history %}
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,54 @@
+<div class="modal fade" id="manualModal" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true" style="z-index: 99999999999999;">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="zag-modal" style="margin-bottom: 0;">Регистрация чека</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="mt-1">Введите необходимые данные с чека</div>
+      <div class="modal-body mt-4">
+
+          <form method="post">
+              {% csrf_token %}
+              <div class="d-flex row" style="row-gap: 14px;">
+                <div class="col-md-12">
+                    <div class="d-flex flex-column" style="gap: 8px;">
+                        <div class="custom-label">ФН</div>
+                        {{ form_manual_check.fn }}
+                    </div>
+                </div>
+                  <div class="col-md-12">
+                    <div class="d-flex flex-column" style="gap: 8px;">
+                        <div class="custom-label">Номер чека</div>
+                        {{ form_manual_check.fd }}
+                    </div>
+                </div>
+                  <div class="col-md-12">
+                    <div class="d-flex flex-column" style="gap: 8px;">
+                        <div class="custom-label">ФП</div>
+                        {{ form_manual_check.fp }}
+                    </div>
+                </div>
+                  <div class="col-md-12">
+                    <div class="d-flex flex-column" style="gap: 8px;">
+                        <div class="custom-label">Дата и Время</div>
+                        {{ form_manual_check.date }}
+                    </div>
+                </div>
+                  <div class="col-md-12">
+                    <div class="d-flex flex-column" style="gap: 8px;">
+                        <div class="custom-label">Сумма</div>
+                        {{ form_manual_check.amount }}
+                    </div>
+                </div>
+
+                  <button class="modal-btn w-100 mt-3" type="submit">
+                  Загрузить
+                </button>
+              </div>
+          </form>
+
+      </div>
+    </div>
+  </div>
+</div>

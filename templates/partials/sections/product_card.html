@@ -1,0 +1,8 @@
+<li class="product-card">
+    {% if product.image %}
+    <div class="product-card__media"><img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy"></div>
+    {% endif %}
+    <div class="product-card__name">{{ product.name }}</div>
+    {% if product.description %}<div class="product-card__description">{{ product.description }}</div>{% endif %}
+    {% if product.link %}<a class="product-card__link" href="{{ product.link }}" target="_blank" rel="noopener">Подробнее</a>{% endif %}
+</li>

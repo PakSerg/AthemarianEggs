@@ -1,0 +1,45 @@
+{% load static %}
+{% with block=blocks.hero %}
+{% if block %}
+<section class="section section--hero" id="hero">
+    <div class="container hero">
+        <div class="hero__content">
+            <h1 class="hero__title">{{ block.title|default:company_info.promotion_name }}</h1>
+            {% if block.subtitle %}<p class="hero__subtitle">{{ block.subtitle }}</p>{% endif %}
+            {% if block.body %}<div class="hero__body">{{ block.body|linebreaks }}</div>{% endif %}
+
+            <div class="hero__actions">
+                {% if CABINET_ACCESSIBLE %}
+                    {% if request.user.is_authenticated %}
+                        <a class="button button--primary" href="{% url 'participants:dashboard' %}">Загрузить чек</a>
+                    {% else %}
+                        <a class="button button--primary" href="{% url 'participants:register' %}">Участвовать</a>
+                        <a class="button button--ghost" href="{% url 'participants:login' %}">Войти</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            {% if next_draw_date_iso %}
+            <div class="countdown" data-countdown="{{ next_draw_date_iso }}">
+                <div class="countdown__label">
+                    До розыгрыша{% if next_draw_week %} {{ next_draw_week }}-й недели{% endif %}
+                </div>
+                <div class="countdown__values">
+                    <div class="countdown__cell"><span data-countdown-days>00</span><small>дней</small></div>
+                    <div class="countdown__cell"><span data-countdown-hours>00</span><small>часов</small></div>
+                    <div class="countdown__cell"><span data-countdown-minutes>00</span><small>минут</small></div>
+                    <div class="countdown__cell"><span data-countdown-seconds>00</span><small>секунд</small></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if block.image %}
+        <div class="hero__media">
+            <img src="{{ block.image.url }}" alt="{{ block.title|default:'' }}" loading="eager">
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

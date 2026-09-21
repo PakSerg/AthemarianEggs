@@ -1,0 +1,58 @@
+{% load static %}
+{% comment %}
+Лоток яиц. Разметка отдаётся скрытой всегда, когда у участника есть чем играть
+(promotion.context_processors.instant_game_context); открывать её при заходе или
+нет, решает instant-prizes.js — он помнит, закрывал ли участник модалку.
+
+Ни номер выигрышного яйца, ни факт выигрыша в разметку не попадают: исход
+попытки определяется на сервере в момент клика (participants:instant-play).
+{% endcomment %}
+{% if instant_game and instant_game.is_enabled and instant_game.attempts_total %}
+<div class="egg-modal"
+     data-egg-modal
+     data-egg-autoopen="{% if instant_game.should_show_modal %}1{% else %}0{% endif %}"
+     data-egg-attempts="{{ instant_game.attempts_left }}"
+     data-egg-play-url="{% url 'participants:instant-play' %}"
+     hidden>
+    <div class="egg-modal__overlay" data-egg-close></div>
+
+    <div class="egg-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="eggModalTitle">
+        <button class="egg-modal__close" type="button" data-egg-close aria-label="Закрыть">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <h2 class="egg-modal__title" id="eggModalTitle">Моментальный приз</h2>
+        <p class="egg-modal__subtitle" data-egg-subtitle>
+            Выберите яйцо — внутри может оказаться приз
+        </p>
+        <p class="egg-modal__attempts">
+            Попыток осталось: <b data-egg-attempts-value>{{ instant_game.attempts_left }}</b>
+        </p>
+
+        <div class="egg-tray" data-egg-tray>
+            {% for egg in instant_game.egg_range %}
+            <button class="egg" type="button" data-egg="{{ egg }}" aria-label="Яйцо {{ egg }}">
+                <span class="egg__shell"></span>
+            </button>
+            {% endfor %}
+        </div>
+
+        <div class="egg-modal__result" data-egg-result hidden>
+            <div class="egg-modal__result-title" data-egg-result-title></div>
+            <div class="egg-modal__result-text" data-egg-result-text></div>
+        </div>
+
+        <div class="egg-modal__actions">
+            <button class="button button--primary" type="button" data-egg-retry hidden>Попробовать ещё раз</button>
+            <a class="button button--ghost" href="{% url 'participants:dashboard' %}" data-egg-to-prizes hidden>Мои призы</a>
+        </div>
+
+        <p class="egg-modal__hint">
+            Каждый принятый чек даёт ещё одну попытку. Моментальный приз можно выиграть
+            один раз за всю акцию.
+        </p>
+    </div>
+</div>
+{% endif %}

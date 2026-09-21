@@ -1,0 +1,34 @@
+{% comment %}
+Секция моментальных призов — «лоток яиц». Сам лоток живёт в личном кабинете
+(partials/instant_prize_modal.html), здесь только витрина и объяснение
+механики: за каждый принятый чек — попытка открыть яйцо.
+{% endcomment %}
+{% with block=blocks.instant_prizes %}
+{% if block %}
+<section class="section section--accent" id="instant-prizes">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Моментальные призы" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+        {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+
+        {% if moment_prizes %}
+        <ul class="prize-grid">
+            {% for prize in moment_prizes %}
+            <li class="prize-card">
+                <div class="prize-card__media"><img src="{{ prize.image.url }}" alt="{{ prize.name }}" loading="lazy"></div>
+                <div class="prize-card__name">{{ prize.name }}</div>
+                <div class="prize-card__caption">{{ prize.caption }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if CABINET_ACCESSIBLE %}
+        <div class="section__actions">
+            <a class="button button--primary" href="{% if request.user.is_authenticated %}{% url 'participants:dashboard' %}{% else %}{% url 'participants:register' %}{% endif %}">Открыть яйцо</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

@@ -1,0 +1,24 @@
+{% with block=blocks.main_prize %}
+{% if block %}
+<section class="section section--accent" id="main-prize">
+    <div class="container main-prize">
+        <div class="main-prize__content">
+            <h2 class="section__title">{{ block.title|default:"Главный приз" }}</h2>
+            {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+            {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+
+            {% if main_prizes %}
+            <ul class="main-prize__list">
+                {% for prize in main_prizes %}
+                <li>{{ prize.name }}{% if prize.count %} — {{ prize.count }} шт.{% endif %}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% if block.image %}
+        <div class="main-prize__media"><img src="{{ block.image.url }}" alt="{{ block.title|default:'Главный приз' }}" loading="lazy"></div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

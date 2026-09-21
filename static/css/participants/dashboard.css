@@ -1,0 +1,2993 @@
+.section {
+    padding-top: 40px;
+}
+
+.section-first {
+    padding-top: 40px;
+}
+
+.zag-section {
+    color: var(--color-black);
+    font-size: 40px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+.desc-section {
+    color: var(--color-black);
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.card-mini-info-user {
+    background-color: var(--color-blue-16);
+    border: 1px solid #FFFFFF0F;
+    padding: 40px;
+    border-radius: 24px;
+    position: relative;
+    z-index: 1;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+/* Шапка: email + ID слева, кнопка справа */
+.head-card-mini-info-user {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    row-gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* flex-basis: 0 + min-width: 0 — чтобы длинный email сжимался с многоточием,
+   а не переносил кнопку «Изменить данные» на отдельную строку */
+.user-card-mini-info-user {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.info-counts-obj-action {
+    margin-top: 32px;
+}
+
+.card-count-tickets {
+    background-color: #FFFFFF;
+    padding: 14px 18px;
+    border-radius: 20px;
+    display: flex;
+    gap: 12px;
+    border: 2px solid var(--color-gray-card);
+}
+
+.img-count-tickets {
+    width: 70px;
+    height: 70px;
+    background-color: var(--color-gray-card);
+    border: 1px solid var(--color-gray-card);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.img-count-tickets img {
+    position: absolute;
+    bottom: -40px;
+    left: -40px;
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+}
+
+.count-tickets-all {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+}
+
+.count-tickets-all span {
+    color: var(--color-red);
+    font-weight: 600;
+}
+
+.desc-count-tickets {
+    color: #030E36B2;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 120%;
+    max-width: 400px;
+}
+
+.desc-count-tickets span {
+    color: var(--color-black);
+}
+
+/* Белая плашка — как .card-stats-card-history-checks на светлых карточках.
+   Раньше счётчики были голым текстом на синем фоне, а число цветом
+   var(--color-red) почти сливалось с var(--color-blue-16). */
+.card-count-prizes {
+    background-color: #FFFFFF;
+    padding: 12px;
+    padding-right: 18px;
+    border-radius: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: fit-content;
+    border: 1px solid #FFFFFF;
+}
+
+.count-prizes {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+}
+
+.count-prizes span {
+    color: var(--color-red);
+    font-weight: 700;
+}
+
+.history-collections-obj {
+    margin-top: 24px;
+    row-gap: 12px;
+}
+
+.card-collection-taste {
+    background-color: #FFFFFF;
+    border: 2px solid var(--color-gray-card);
+    padding: 32px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    justify-content: space-between;
+}
+
+.card-collection-history-fruitcoins {
+    background-color: #FFFFFF;
+    border: 2px solid var(--color-gray-card);
+    padding: 32px;
+    border-radius: 20px;
+}
+
+.wrap-zag-top-card-collection-taste {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zag-top-card-collection-taste {
+    color: var(--color-black);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 110%;
+}
+
+.card-stats-card-collection-taste {
+    background-color: #FEED0433;
+    padding: 6px;
+    padding-left: 10px;
+    border-radius: 8px;
+    border: 1.5px solid #FEED0433;
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 124%;
+    cursor: pointer;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.card-stats-card-collection-taste span {
+    color: var(--color-yellow);
+}
+
+.top-card-collection-taste {
+    display: flex;
+    gap: 18px;
+    flex-direction: column;
+}
+
+.wrap-img-collection-taste {
+    width: 72px;
+    height: 72px;
+    border-radius: 90px;
+    position: relative;
+    border: 1px solid var(--color-gray-card);
+    background-color: var(--color-gray-card);
+}
+
+.wrap-img-collection-taste:not(:first-child) {
+    z-index: 10;
+    margin-left: -18px;
+}
+
+.wrap-img-collection-taste.not-active {
+    background-color: #9f9f9f59;
+    border: 1px solid #9f9f9f59;
+    opacity: 0.4;
+}
+
+.collection-taste img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 90px;
+    overflow: hidden;
+}
+
+.remove-img-collection-taste {
+    position: absolute;
+    top: 50%;
+    right: -8px;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 0 2px white;
+}
+
+.collection-taste {
+    display: flex;
+}
+
+.more-img-collection-taste {
+    background-color: var(--color-gray-card);
+    border: 4px solid #FFFFFF;
+    width: 72px;
+    height: 72px;
+    border-radius: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-red);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 120%;
+    z-index: 10;
+    position: relative;
+    margin-left: -20px;
+}
+
+.bottom-card-collection-taste {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.list-history-fruitcoins {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item-history-fruitcoins {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--color-gray-card);
+}
+
+.header-item-history-fruitcoins {
+    background-color: var(--color-gray-card);
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.el-item-history-fruitcoins {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #030E36E5;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    width: 100%;
+}
+
+.el-item-history-fruitcoins-coin {
+    width: 50%;
+}
+
+.watch-more-history-fruitcoins {
+    color: var(--color-red);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    cursor: pointer;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.img-ellipse-card-mini-info-user {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    border-radius: 32px;
+    width: 80%;
+}
+
+/* Длинный email обрезается многоточием в одну строку; полное значение —
+   в title. -webkit-box/line-clamp заменён на обычный nowrap: с ним
+   многоточие рисуется предсказуемо во всех браузерах. */
+.email-card-mini-info-user {
+    color: #FFFFFF;
+    max-width: 100%;
+    font-size: 28px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 120%;
+    font-family: var(--font-title);
+}
+
+.id-card-mini-info-user {
+    color: #FFFFFFCC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    margin-top: 10px;
+}
+
+.btn-change-profile-card-mini-info-user {
+    background-color: #FFFFFF14;
+    border: 1.5px solid #FFFFFF1F;
+    padding: 11px 16px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #FFFFFF;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    height: 42px;
+    justify-content: center;
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.btn-change-profile-card-mini-info-user:hover {
+    background-color: #FFFFFF29;
+    border-color: #FFFFFF3D;
+    color: #FFFFFF;
+}
+
+.stats-card-mini-info-user {
+    gap: 12px;
+}
+
+.card-stats-card-mini-info-user {
+    background-color: #FFFFFF;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.card-stats-card-mini-info-user span {
+    color: var(--color-red);
+    font-weight: 700;
+}
+
+.card-history-checks {
+    background-color: var(--color-gray-card);
+    padding: 40px;
+    border-radius: 24px;
+}
+
+.zag-card-history-checks {
+    color: var(--color-black);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+}
+
+.card-stats-card-history-checks {
+    background-color: #FFFFFF;
+    border: 1px solid #FFFFFF;
+    padding: 12px;
+    padding-right: 18px;
+    border-radius: 10px;
+    color: var(--color-black);
+    font-weight: 500;
+    line-height: 120%;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-stats-card-history-checks span {
+    color: var(--color-red);
+    font-weight: 700;
+}
+
+.table-history-checks {
+    width: 100%;
+}
+
+.header-table-history-checks {
+    background-color: var(--color-white);
+}
+
+.header-table-history-checks th {
+    padding: 12px;
+    color: var(--color-black);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.header-table-history-checks .left-radius-th {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.header-table-history-checks .right-radius-th {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.img-qr-check {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.body-table-history-checks {
+    transition: all 0.3s ease;
+}
+
+.body-table-history-checks:hover {
+    background-color: var(--color-gray-card);
+}
+
+.body-table-history-checks td {
+    padding: 12px;
+    white-space: nowrap;
+}
+
+.value-table-history-checks {
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.status-table-history-checks {
+    border: 1px solid transparent;
+    padding: 6px;
+    padding-right: 14px;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: 500;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-table-history-checks.success {
+    color: #37CD1A;
+    background-color: #37CD1A1F;
+    border-color: #37CD1A1F;
+}
+
+.status-table-history-checks.warning {
+    color: #EBB917;
+    background-color: #EBB9171F;
+    border-color: #EBB9171F;
+}
+
+.status-table-history-checks.danger {
+    color: #FF2E23;
+    background-color: #FF2E231F;
+    border-color: #FF2E231F;
+}
+
+.status-table-history-checks.winner {
+    color: #FFFFFF;
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    max-width: 100%;
+}
+
+.link-pagination {
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.link-pagination.active {
+    background-color: var(--color-red);
+    color: #FFFFFF;
+}
+
+.card-time-verif-card-history-checks {
+    background-color: var(--color-white);
+    border: 1px solid #E6E8F0;
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--color-black);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-register-check {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    color: #FFFFFF;
+    border-radius: 12px;
+    font-weight: 500;
+    line-height: 120%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    height: 48px;
+    padding: 14px 18px;
+    white-space: nowrap;
+}
+
+.btn-register-check svg {
+    overflow: clip;
+}
+
+.desc-register-check {
+    color: #030E36B2;
+    line-height: 120%;
+    font-size: 16px;
+    font-weight: 500;
+    max-width: 298px;
+}
+
+.desc-register-check span {
+    color: var(--color-red);
+}
+
+.card-our-prizes {
+    background-color: var(--color-gray-card);
+    padding: 20px;
+    border-radius: 24px;
+}
+
+.zag-card-our-prizes {
+    color: var(--color-black);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+}
+
+.card-stat-card-our-prizes {
+    background-color: #FFFFFF;
+    border: 1px solid #FFFFFF;
+    padding: 12px;
+    padding-right: 18px;
+    border-radius: 10px;
+    color: var(--color-black);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-stat-card-our-prizes span {
+    color: var(--color-red);
+    font-weight: 700;
+}
+
+.list-card-our-prizes {
+    background-color: var(--color-white);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* Промежуток между карточками призов — 16px, как в макете (бутстраповские 24
+   съедают ширину, которой карточке не хватает под строку с датой). */
+.list-card-our-prizes .row {
+    --bs-gutter-x: 1rem;
+}
+
+.card-prize-card-our-prizes {
+    background-color: var(--color-white);
+    padding: 8px;
+    border-radius: 20px;
+    position: relative;
+}
+
+.wrap-img-card-prize-card-our-prizes {
+    background: var(--color-blue-16);
+    border-radius: 16px;
+    width: 100%;
+    height: 226px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-card-prize-card-our-prizes {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background-color: var(--color-red);
+    color: var(--color-white);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 120%;
+}
+
+.badge-card-prize-card-our-prizes img {
+    width: 16px;
+    height: 16px;
+}
+
+.img-card-prize-card-our-prizes {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.name-card-prize-card-our-prizes {
+    color: var(--color-black);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.date-result-draw-card-prize-card-our-prizes {
+    background-color: #FFFFFF;
+    padding: 14px;
+    border-radius: 10px;
+    color: #787E91;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zag-all-draw-prizes {
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 110%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.desc-all-draw-prizes {
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 140%;
+    text-align: center;
+    margin: 0 auto;
+    margin-top: 12px;
+    max-width: 580px;
+}
+
+.list-all-draw-prizes {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.swiper-slide-prizes {
+    width: 250px!important;
+    height: auto!important;
+}
+
+.swiper-slide-taste {
+    width: 200px!important;
+    height: auto!important;
+}
+
+.img-card-swiper-slide-taste {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 999px;
+}
+
+.wrap-img-card-swiper-slide-taste {
+    position: relative;
+    height: 200px;
+    width: 100%;
+    border-radius: 999px;
+}
+
+.bag-img-card-swiper-slide-taste {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #EFEFF1b5;
+    border-radius: 999px;
+    left: 0;
+    top: 0;
+}
+
+.success-img-card-swiper-slide-taste {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-img-card-swiper-slide-taste::before {
+    content: "✓";
+    position: absolute;
+    font-size: 48px;
+    color: #008b02;
+    background: var(--color-gray-card);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    backdrop-filter: blur(4px);
+}
+
+.card-swiper-slide-taste {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.name-card-swiper-slide-taste {
+    color: var(--color-black);
+    font-size: 24px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.count-card-all-draw-prizes {
+    color: #787E91;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.btn-prev, .btn-next {
+    background-color: #FFFFFF;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+#watchCheckModal .modal-dialog {
+    max-width: 750px;
+}
+
+#watchCheckModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+}
+
+#watchCheckModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#watchCheckModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+#watchCheckModal .modal-body {
+    padding: 0;
+}
+
+#watchCheckModal .modal-body .img-check-modal {
+    width: 100%;
+    height: 460px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+#checkModal .modal-dialog {
+    max-width: 494px;
+}
+
+#checkModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+}
+
+#checkModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#checkModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+#checkModal .modal-body {
+    padding: 0;
+}
+
+#qr-reader {
+    height: 350px!important;
+}
+
+#qr-reader video {
+    height: 350px!important;
+    object-fit: cover;
+    border-radius: 20px!important;
+}
+
+#qr-shaded-region {
+    border-radius: 20px!important;
+}
+
+#load-check-manual, #load-check-image {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    border-radius: 12px;
+    padding: 12px 18px;
+    color: #FFFFFF;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    height: 48px;
+}
+
+#manualModal .modal-btn {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    border-radius: 12px;
+    padding: 12px 18px;
+    color: #FFFFFF;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#manualModal .modal-dialog {
+    max-width: 494px;
+}
+
+#manualModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+}
+
+#manualModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#manualModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+#manualModal .modal-body {
+    padding: 0;
+}
+
+#manualModal .custom-label {
+    color: var(--color-black);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#manualModal .form-control {
+    background-color: #FFFFFF;
+    border: 1px solid #E6E8F0;
+    padding: 14px;
+    border-radius: 10px;
+    outline: none!important;
+    box-shadow: none!important;
+    transition: all 0.3s ease;
+}
+
+#manualModal .form-control:focus {
+    border-color: var(--color-red);
+}
+
+.description-card-prize-card-our-prizes {
+    color: #787E91;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 130%;
+    margin-top: 4px;
+}
+
+.card-count-card-all-draw-prizes {
+    color: #FFFFFFCC;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.info-card-prize-card-our-prizes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+/* Строки «Дата покупки» и «Розыгрыш» в карточке выигранного приза.
+   14px, а не 16: в карточку шириной в четверть ряда «Дата покупки» и
+   «09:35 25.08.2026» в одну строку при 16px не помещаются. Если ширины всё же
+   не хватит (узкий ноутбук), значение целиком переедет на вторую строку —
+   flex-wrap не даёт подписи ломаться посреди слова. */
+.row-info-card-prize-card-our-prizes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: var(--color-blue-16);
+    font-size: 14px;
+    line-height: 120%;
+}
+
+.label-row-info-card-prize-card-our-prizes {
+    color: #D0D5E5;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.value-row-info-card-prize-card-our-prizes {
+    color: var(--color-white);
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Статус приза: что происходит с договором и когда забирать приз */
+.status-card-prize-card-our-prizes {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #E2E5EF;
+}
+
+.label-status-card-prize-card-our-prizes {
+    color: var(--color-border-blue);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 130%;
+}
+
+.text-status-card-prize-card-our-prizes {
+    color: var(--color-blue-16);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 130%;
+}
+
+.link-status-card-prize-card-our-prizes {
+    /* Именно inline, а не flex: тогда длинная подпись переносится по словам,
+       а стрелка остаётся приклеенной к последнему слову, как в макете. */
+    display: inline;
+    margin-top: 4px;
+    color: var(--color-red);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 130%;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link-status-card-prize-card-our-prizes:hover {
+    color: var(--color-red-hover);
+}
+
+.icon-link-status-card-prize-card-our-prizes {
+    margin-left: 4px;
+    vertical-align: -3px;
+}
+
+.card-count-card-all-draw-prizes span {
+    color: var(--color-red)!important;
+    font-weight: 700;
+}
+
+.card-all-draw-prizes {
+    padding: 4px;
+    border-radius: 20px;
+    background-color: var(--color-blue-16);
+    position: relative;
+    overflow: hidden;
+}
+
+.week-card-all-draw-prizes {
+    background-color: var(--color-yellow);
+    padding: 10px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 120px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: var(--font-title);
+    font-weight: 700;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.card-all-draw-prizes.weekly {
+    background-color: var(--color-gray-card);
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.wrap-info-card-all-draw-prizes {
+    max-width: 486px;
+}
+
+.zag-info-card-all-draw-prizes {
+    color: var(--color-black);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+}
+
+.desc-info-card-all-draw-prizes {
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    margin-top: 12px;
+}
+
+.count-info-card-all-draw-prizes {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 14px 28px 18px;
+    color: #FFFFFF;
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 90%;
+    text-transform: uppercase;
+    margin-top: 55px;
+    background: transparent;
+    border: none;
+    z-index: 0;
+    isolation: isolate;
+}
+
+.count-info-card-all-draw-prizes::before {
+    content: '';
+    position: absolute;
+    inset: -10px -14px;
+    z-index: -1;
+    background: url('../../img/participants/count-badge-bumpy.svg') center / 100% 100% no-repeat;
+    pointer-events: none;
+}
+
+.right-info-card-all-draw-prizes {
+    display: flex;
+    gap: 25px;
+    max-width: 590px;
+}
+
+.wrap-img-right-info-card-all-draw-prizes {
+    position: relative;
+}
+
+.img-right-info-card-all-draw-prizes {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.text-img-right-info-card-all-draw-prizes {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 110%;
+    text-transform: uppercase;
+    text-align: center;
+    color: #FFFFFF;
+    width: 100%;
+}
+
+.item-right-info-card-all-draw-prizes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.item-right-info-card-all-draw-prizes.margin-top {
+    margin-top: auto;
+}
+
+.desc-item-right-info-card-all-draw-prizes {
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    text-align: center;
+}
+
+.card-all-draw-prizes.monthly {
+    background-color: #DB06301A;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 130px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.count-info-card-all-draw-prizes-monthly {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 14px 28px 18px;
+    color: #FFFFFF;
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 90%;
+    text-transform: uppercase;
+    margin-top: 55px;
+    background: transparent;
+    border: none;
+    z-index: 0;
+    isolation: isolate;
+}
+
+.count-info-card-all-draw-prizes-monthly::before {
+    content: '';
+    position: absolute;
+    inset: -10px -14px;
+    z-index: -1;
+    background: url('../../img/participants/count-badge-bumpy-green.svg') center / 100% 100% no-repeat;
+    pointer-events: none;
+}
+
+.left-info-card-all-draw-prizes .desc-info-card-all-draw-prizes {
+    max-width: 466px;
+}
+
+.right-info-card-all-draw-prizes-monthly {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-right: auto;
+}
+
+.item-right-info-card-all-draw-prizes-monthly {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-black);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 120%;
+}
+
+.left-info-card-all-draw-prizes {
+    max-width: 486px;
+}
+
+.img-1-monthly-card-all-draw-prizes {
+    position: absolute;
+    right: -100px;
+    bottom: -250px;
+    width: 520px;
+    height: 520px;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.img-2-monthly-card-all-draw-prizes {
+    position: absolute;
+    right: 100px;
+    top: -70px;
+    width: 156px;
+    height: 150px;
+    object-fit: cover;
+    z-index: -1;
+    transform: rotate(30deg);
+}
+
+.img-3-monthly-card-all-draw-prizes {
+    position: absolute;
+    left: 580px;
+    bottom: -25px;
+    width: 93px;
+    height: 93px;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.img-4-monthly-card-all-draw-prizes {
+    position: absolute;
+    left: 500px;
+    bottom: -25px;
+    width: 150px;
+    height: 120px;
+    object-fit: cover;
+    z-index: -1;
+    transform: rotate(30deg);
+}
+
+.img-5-monthly-card-all-draw-prizes {
+    position: absolute;
+    left: -30px;
+    bottom: -45px;
+    width: 130px;
+    height: 120px;
+    object-fit: cover;
+    z-index: -1;
+    transform: rotate(30deg);
+}
+
+.card-all-draw-prizes.final {
+    background-color: var(--color-yellow);
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-all-draw-prizes.final .zag-info-card-all-draw-prizes {
+    color: #FFFFFF;
+}
+
+.card-all-draw-prizes.final .desc-info-card-all-draw-prizes {
+    color: #FFFFFF;
+}
+
+.count-info-card-all-draw-prizes-final {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 90%;
+    margin-top: auto;
+}
+
+.card-all-draw-prizes.final .left-info-card-all-draw-prizes {
+    display: flex;
+    flex-direction: column;
+}
+
+.zag-empty-history-checks {
+    color: var(--color-black);
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.desc-empty-history-checks {
+    color: #030E36B2;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+}
+
+#tasteModal .modal-dialog {
+    max-width: 632px;
+}
+
+#tasteModal .modal-content {
+    background-color: #f7f7f7;
+    border-radius: 20px;
+    padding: 40px;
+}
+
+#tasteModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#tasteModal .wrap-zag-modal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+#tasteModal .card-count-collect-tatse-modal {
+    background-color: var(--color-gray-card);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: var(--color-black);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 124%;
+}
+
+#tasteModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+    text-align: center;
+}
+
+#tasteModal .modal-body {
+    padding: 0;
+}
+
+#tasteModal .desc-modal-body {
+    color: #030E36E5;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 120%;
+    text-align: center;
+    max-width: 364px;
+    margin: 0 auto;
+    margin-top: 12px;
+}
+
+#tasteModal .desc-modal-body span {
+    color: var(--color-red);
+}
+
+#tasteModal .list-taste-modal {
+    margin-top: 24px;
+    row-gap: 8px;
+    max-height: 450px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red) #FFFFFF;
+}
+
+#tasteModal .list-taste-modal::-webkit-scrollbar {
+    width: 4px;
+}
+
+#tasteModal .list-taste-modal::-webkit-scrollbar-thumb {
+    background-color: var(--color-red);
+}
+
+#tasteModal .card-taste-modal {
+    background-color: #FFFFFF;
+    padding: 8px;
+    padding-bottom: 16px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#tasteModal .img-taste-modal {
+    width: 100%;
+    height: 120px;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--color-gray-card);
+}
+
+#tasteModal .img-taste-modal.not-active {
+    opacity: 0.4;
+    background-color: #d3d3d3;
+}
+
+#tasteModal .modal-header .btn-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+#tasteModal .check-mark-success-taste-modal {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-red);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+#tasteModal .check-mark-success-taste-modal::before {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 7px;
+    border-right: 2px solid #FFFFFF;
+    border-bottom: 2px solid #FFFFFF;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+
+}
+
+#tasteModal .btn-register-check {
+    margin: 0 auto;
+    margin-top: 32px;
+    width: 100%;
+}
+
+#tasteModal .img-taste-modal img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#tasteModal .name-taste-modal {
+    color: #030E36E5;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 120%;
+    text-align: center;
+}
+
+#historyModal .modal-dialog {
+    max-width: 780px;
+}
+
+#historyModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 40px;
+}
+
+#historyModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+    justify-content: center;
+}
+
+#historyModal .btn-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+#historyModal .card-count-fruitcoins-modal {
+    background-color: var(--color-gray-card);
+    padding: 6px;
+    padding-left: 10px;
+    border-radius: 8px;
+    color: #030E36CC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 124%;
+    margin: 0 auto;
+    margin-top: 18px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+
+#historyModal .card-count-fruitcoins-modal span {
+    color: var(--color-red);
+}
+
+#historyModal .btn-register-check {
+    margin: 0 auto;
+    margin-top: 32px;
+    width: 100%;
+}
+
+#historyModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+    text-align: center;
+}
+
+#historyModal .modal-body {
+    padding: 0;
+}
+
+#historyModal .list-history-fruitcoins {
+    margin-top: 28px;
+    max-height: 450px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red) #FFFFFF;
+}
+
+#historyModal .list-history-fruitcoins::-webkit-scrollbar {
+    width: 4px;
+}
+
+#historyModal .list-history-fruitcoins::-webkit-scrollbar-thumb {
+    background-color: var(--color-red);
+}
+
+#successModal .modal-dialog {
+    max-width: 500px;
+}
+
+#successModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+    border-color: #FFFFFF;
+}
+
+#successModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#successModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+#successModal .modal-body {
+    padding: 0;
+}
+
+#successModal .text-modal-body {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 400;
+}
+
+#successModal .wrap-img-success-add-check {
+    background-color: #FCFFFB;
+    border: 2.5px solid #37CD1A;
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+#successModal .wrap-img-success-add-check svg{
+    color: #37CD1A;
+}
+
+#accountBlockedModal .modal-dialog {
+    max-width: 573px;
+}
+
+#accountBlockedModal .modal-content {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+    border-color: #FFFFFF;
+}
+
+#accountBlockedModal .modal-header {
+    padding: 0;
+    border-bottom: 0;
+}
+
+#accountBlockedModal .zag-modal {
+    color: var(--color-black);
+    font-size: 32px;
+    line-height: 100%;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+#accountBlockedModal .modal-body {
+    padding: 0;
+}
+
+#accountBlockedModal .text-modal-body {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.body-card-prize-card-our-prizes {
+    padding: 12px;
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.img-empty-win-prizes {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+}
+
+.zag-empty-win-prizes {
+    color: var(--color-black);
+}
+
+.desc-empty-win-prizes {
+    color: #030E36B2;
+    text-align: center;
+}
+
+.img-empty-history-checks {
+    width: 129px;
+    height: 170px;
+    object-fit: contain;
+}
+
+.value-table-history-checks-message {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.svg-icon-sort path {
+    transition: all 0.3s ease;
+}
+
+.svg-icon-sort:hover path {
+    stroke: var(--color-red);
+}
+
+.card-quiz {
+    background: linear-gradient(165.41deg, var(--color-blue-16) -65.95%, var(--color-red) 90.42%);
+    padding: 52px 40px;
+    border-radius: 32px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.zag-card-quiz {
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 110%;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+}
+
+.desc-card-quiz {
+    color: #FFFFFF;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 110%;
+    margin-top: 6px;
+}
+
+.add-fruitcoins-card-quiz {
+    margin-top: 34px;
+    background-color: var(--color-yellow);
+    border: 3px solid var(--color-yellow);
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 52px;
+    font-weight: 600;
+    line-height: 90%;
+    text-transform: uppercase;
+}
+
+.btn-start-quiz {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    padding: 16px 32px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 57px;
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 124%;
+    margin-top: 40px;
+    z-index: 2;
+}
+
+.img-1-card-quiz {
+    position: absolute;
+    right: 0;
+    bottom: -80px;
+    width: 404px;
+    height: 407px;
+    object-fit: cover;
+}
+
+.img-2-card-quiz {
+    position: absolute;
+    left: 250px;
+    top: -80px;
+    width: 112px;
+    height: 360px;
+    object-fit: cover;
+    transform: rotate(30deg);
+}
+
+.img-3-card-quiz {
+    position: absolute;
+    left: 60px;
+    bottom: -90px;
+    width: 112px;
+    height: 360px;
+    transform: rotate(-25deg);
+    object-fit: cover;
+}
+
+.img-4-card-quiz {
+    position: absolute;
+    left: 70px;
+    top: -45px;
+    width: 120px;
+    height: 110px;
+    object-fit: cover;
+    transform: rotate(-30deg);
+}
+
+.img-5-card-quiz {
+    position: absolute;
+    right: 450px;
+    bottom: -20px;
+    width: 100px;
+    height: 93px;
+    object-fit: cover;
+    transform: rotate(20deg);
+}
+
+.img-6-card-quiz {
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 0;
+    height: 100%;
+    z-index: -1;
+}
+
+.img-7-card-quiz {
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 0;
+    width: 1000px;
+    z-index: -1;
+}
+
+.img-8-card-quiz {
+    position: absolute;
+    bottom: -80px;
+    height: 150px;
+    width: 140px;
+    left: 329px;
+    z-index: -1;
+    object-fit: cover;
+    transform: rotate(20deg);
+}
+
+.img-9-card-quiz {
+    position: absolute;
+    bottom: -20px;
+    height: 75px;
+    width: 81px;
+    right: 410px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-10-card-quiz {
+    position: absolute;
+    bottom: -60px;
+    height: 146px;
+    width: 150px;
+    left: 10px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-11-card-quiz {
+    position: absolute;
+    top: -30px;
+    height: 98px;
+    width: 98px;
+    right: 240px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-12-card-quiz {
+    position: absolute;
+    top: -40px;
+    height: 98px;
+    width: 98px;
+    left: 20px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.card-question-quiz {
+    background-color: #FFFFFF;
+    padding: 52px 40px;
+    border-radius: 32px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.img-1-question-quiz {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -1;
+    object-fit: cover;
+}
+
+.num-question-quiz {
+    color: #030E3680;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 113%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.zag-question-quiz {
+    color: var(--color-black);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 110%;
+    margin: 0 auto;
+    margin-top: 8px;
+    text-align: center;
+    max-width: 760px;
+}
+
+.wrap-answer-question-quiz {
+    margin: 0 auto;
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.col-answer-question-quiz {
+    display: flex;
+    gap: 12px;
+}
+
+.answer-question-quiz {
+    background-color: var(--color-gray-card);
+    border: 1.5px solid var(--color-gray-card);
+    padding: 12px 24px;
+    border-radius: 30px;
+    color: var(--color-black);
+    font-weight: 500;
+    line-height: 124%;
+    min-width: 334px;
+    cursor: pointer;
+}
+
+.wrap-btn-question-quiz {
+    display: flex;
+    gap: 12px;
+    margin: 0 auto;
+    margin-top: 34px;
+    justify-content: center;
+}
+
+.btn-prev-question-quiz {
+    background-color: var(--color-gray-card);
+    border: 1px solid var(--color-gray-card);
+    padding: 14px 40px;
+    border-radius: 10px;
+    color: var(--color-black);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+.btn-next-question-quiz {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    padding: 14px 40px;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+.btn-next-question-quiz:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.quiz-hidden {
+    display: none !important;
+}
+
+#quiz-intro[hidden],
+#questions-quiz[hidden] {
+    display: none;
+}
+
+.answer-question-quiz.is-selected {
+    background-color: var(--color-red);
+    border-color: var(--color-red);
+    color: #FFFFFF;
+}
+
+.quiz-result-text {
+    margin-top: 16px;
+    color: var(--color-black);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 140%;
+    max-width: 640px;
+}
+
+.section-all-prizes {
+    padding-top: 80px;
+}
+
+.zag-quiz-result {
+    color: var(--color-black);
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 100%;
+    text-align: center;
+    font-family: var(--font-title);
+}
+
+.img-2-question-quiz {
+    position: absolute;
+    bottom: -60px;
+    height: 240px;
+    width: 260px;
+    right: 90px;
+    z-index: -1;
+    object-fit: cover;
+    transform: rotate(30deg);
+}
+
+.img-3-question-quiz {
+    position: absolute;
+    bottom: -70px;
+    height: 188px;
+    width: 203px;
+    right: -10px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-4-question-quiz {
+    position: absolute;
+    top: -60px;
+    height: 188px;
+    width: 203px;
+    right: 30px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-5-question-quiz {
+    position: absolute;
+    bottom: -80px;
+    height: 188px;
+    width: 203px;
+    left: 60px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.img-6-question-quiz {
+    position: absolute;
+    top: -80px;
+    height: 188px;
+    width: 203px;
+    left: 150px;
+    z-index: -1;
+    object-fit: cover;
+    transform: rotate(-30deg);
+}
+
+.img-7-question-quiz {
+    position: absolute;
+    top: -80px;
+    height: 188px;
+    width: 203px;
+    left: 50px;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.section-faq {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    padding-left: 100px!important;
+    padding-right: 100px!important;
+}
+
+.zag-section-faq {
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 110%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.row-faq {
+    margin-top: 36px;
+    row-gap: 24px;
+}
+
+.card-faq {
+    background-color: var(--color-blue-16);
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.gap-row-cards-obj-counts-action {
+    gap: 12px;
+}
+
+.gap-row-cards-obj-counts-action > * {
+    min-width: 0;
+}
+
+.question-faq {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.zag-question-faq {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 120%;
+}
+
+.show-answer-faq {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-red);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.show-answer-faq::before {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 2px;
+    background-color: white;
+    border-radius: 1px;
+}
+
+.show-answer-faq::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 14px;
+    background-color: white;
+    border-radius: 1px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.card-faq.is-open .show-answer-faq::after {
+    opacity: 0;
+    transform: scaleY(0);
+}
+
+.answer-faq {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+}
+
+.card-faq.is-open .answer-faq {
+    grid-template-rows: 1fr;
+}
+
+.answer-faq-inner {
+    overflow: hidden;
+    color: #FFFFFFCC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    padding-top: 0;
+    transition: padding-top 0.35s ease;
+}
+
+.card-faq.is-open .answer-faq-inner {
+    padding-top: 12px;
+}
+
+.btn-register-check-faq {
+    margin: 0 auto;
+    margin-top: 36px;
+    background-color: var(--color-red);
+    padding: 16px 32px;
+    border: 1px solid var(--color-red);
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 120%;
+    display: flex;
+    justify-content: center;
+    transition: all 0.3s ease;
+    height: 56px;
+    text-transform: uppercase;
+}
+
+.modal-backdrop{
+    display: none !important;
+}
+
+.modal-content{
+    left: unset !important;
+    top: unset !important;
+    transform: unset !important;
+}
+
+.card-mini-info-user{
+    color: #FFFFFF08;
+}
+
+.card-main-prize {
+    background-color: var(--color-blue-16);
+    position: relative;
+    border-radius: 32px;
+    padding: 48px;
+    margin-top: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.img-main-prize {
+    width: 934px;
+    height: 403px;
+    object-fit: cover;
+}
+
+.desc-card-main-prize {
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: clamp(1.125rem, 1.0931372549rem + 0.1307189542vw, 1.25rem);
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.bag-img-card-main-prize {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.zag-card-main-prize {
+    color: #FFFFFF;
+    font-size: 60px;
+    font-weight: 900;
+    line-height: 90%;
+    text-transform: uppercase;
+}
+
+.value-card-main-prize {
+    font-size: 100px;
+    font-weight: 600;
+    line-height: 110%;
+    color: #FFFFFF;
+    background-color: var(--color-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 151px;
+    padding-left: 70px;
+    padding-right: 70px;
+    transform: skewX(-15deg);
+}
+
+@media (max-width: 1500px) {
+    #tasteModal .list-taste-modal {
+        max-height: 300px;
+    }
+    #historyModal .list-history-fruitcoins {
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 1300px) {
+    .count-info-card-all-draw-prizes, .count-info-card-all-draw-prizes-monthly {
+        font-size: 60px;
+        text-align: center;
+    }
+    .img-2-card-quiz {
+        display: none;
+    }
+    .img-1-card-quiz {
+        right: -40px;
+    }
+}
+
+@media (max-width: 1250px) {
+    .value-table-history-checks-message {
+        max-width: 100%;
+    }
+    .desc-register-check {
+        font-size: 12px;
+    }
+    .el-item-history-fruitcoins {
+        font-size: 14px;
+    }
+    .count-info-card-all-draw-prizes, .count-info-card-all-draw-prizes-monthly {
+        font-size: 50px;
+    }
+    .img-final-card-all-draw-prizes {
+        width: 500px;
+    }
+    .add-fruitcoins-card-quiz {
+        font-size: 40px;
+    }
+    .img-1-card-quiz {
+        bottom: -130px;
+    }
+}
+
+@media (max-width: 1150px) {
+    .value-card-main-prize {
+        font-size: 70px;
+    }
+    .bottom-card-collection-taste {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    .desc-register-check {
+        text-align: center;
+    }
+    .bottom-card-collection-taste .btn-register-check {
+        width: 100%;
+    }
+    .item-history-fruitcoins {
+        border: 1px solid var(--color-gray-card);
+        padding-bottom: 0;
+        position: relative;
+        flex-direction: column;
+        border-radius: 10px;
+        gap: 8px;
+        padding: 10px;
+    }
+    .el-item-history-fruitcoins-coin {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: fit-content;
+        background-color: var(--color-gray-card);
+        padding: 4px;
+        border-radius: 6px;
+        color: var(--color-red);
+    }
+    .list-history-fruitcoins {
+        max-height: 150px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-red) #FFFFFF;
+    }
+    .list-history-fruitcoins::-webkit-scrollbar {
+        width: 4px;
+    }
+    .list-history-fruitcoins::-webkit-scrollbar-thumb {
+        background-color: var(--color-red);
+    }
+    .zag-top-card-collection-taste {
+        font-size: 20px;
+    }
+    .card-collection-history-fruitcoins {
+        padding: 24px;
+    }
+    .card-collection-taste {
+        padding: 24px;
+    }
+    .card-all-draw-prizes {
+        padding: 6px;
+    }
+    .card-all-draw-prizes.weekly {
+        flex-direction: column;
+    }
+    .wrap-info-card-all-draw-prizes {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .zag-info-card-all-draw-prizes {
+        text-align: center;
+    }
+    .desc-info-card-all-draw-prizes {
+        text-align: center;
+    }
+    .count-info-card-all-draw-prizes {
+        margin-top: 24px;
+    }
+    .right-info-card-all-draw-prizes {
+        max-width: 100%;
+        justify-content: space-between;
+    }
+    .right-info-card-all-draw-prizes-monthly {
+        display: none;
+    }
+    .left-info-card-all-draw-prizes {
+        max-width: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .left-info-card-all-draw-prizes .desc-info-card-all-draw-prizes {
+        max-width: 50%;
+        text-align: center;
+    }
+    .card-all-draw-prizes.monthly {
+        min-height: 350px;
+    }
+    .card-all-draw-prizes.final {
+        flex-direction: column;
+        gap: 28px;
+    }
+    .count-info-card-all-draw-prizes-final {
+        margin-top: 32px;
+        text-align: center;
+    }
+    .img-final-card-all-draw-prizes {
+        width: 100%;
+        object-fit: cover;
+    }
+    .img-8-card-quiz {
+        display: none;
+    }
+    .img-5-card-quiz {
+        display: none;
+    }
+    .img-9-card-quiz {
+        display: none;
+    }
+    .card-quiz {
+        align-items: flex-start;
+    }
+    .img-3-card-quiz {
+        display: none;
+    }
+    .img-6-question-quiz {
+        height: 100px;
+        object-fit: contain;
+        top: -40px;
+    }
+    .img-7-question-quiz {
+        height: 100px;
+        object-fit: contain;
+        top: -20px;
+    }
+    .img-4-question-quiz {
+        height: 120px;
+        object-fit: contain;
+    }
+    .img-3-question-quiz {
+        height: 120px;
+        object-fit: contain;
+        bottom: -20px;
+    }
+    .img-2-question-quiz {
+        height: 120px;
+        object-fit: contain;
+        bottom: -20px;
+    }
+    .section-faq {
+        padding-left: 20px!important;
+        padding-right: 20px!important;
+    }
+    .card-all-draw-prizes.monthly {
+        display: flex;
+        flex-direction: column;
+    }
+    .header-item-history-fruitcoins {
+        display: none;
+    }
+    .count-info-card-all-draw-prizes-monthly {
+        margin-top: 24px;
+    }
+}
+
+@media (max-width: 992px) {
+    .value-card-main-prize {
+        font-size: 50px;
+        height: 100px;
+    }
+    .zag-card-main-prize {
+        font-size: 40px;
+    }
+    .zag-section {
+        font-size: 32px;
+    }
+    .card-mini-info-user {
+        padding: 20px;
+        overflow: hidden;
+    }
+    .card-collection-history-fruitcoins .wrap-zag-top-card-collection-taste {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .gap-row-cards-obj-counts-action {
+        gap: 8px;
+    }
+    .card-count-prizes {
+        width: 100%;
+        white-space: nowrap;
+        justify-content: center;
+    }
+    .desc-count-tickets {
+        font-size: 12px;
+        max-width: 100%;
+    }
+    .card-count-tickets .gap-2 {
+        flex: 1;
+    }
+    .col-answer-question-quiz {
+        flex-direction: column;
+        width: 100%;
+    }
+    .answer-question-quiz {
+        min-width: 100%;
+    }
+    .card-quiz {
+        min-height: 450px;
+        justify-content: flex-start;
+    }
+    .add-fruitcoins-card-quiz {
+        font-size: 32px;
+        margin-top: 24px;
+    }
+    .zag-card-quiz {
+        font-size: 40px;
+    }
+    .btn-start-quiz {
+        margin-top: 24px;
+    }
+    .card-quiz {
+        padding: 24px;
+    }
+    .zag-card-quiz {
+        text-align: center;
+    }
+    .section-all-prizes {
+        padding-top: 60px;
+    }
+    .zag-info-card-all-draw-prizes {
+        font-size: 20px;
+    }
+    .count-info-card-all-draw-prizes, .count-info-card-all-draw-prizes-monthly {
+        font-size: 40px;
+    }
+    .left-info-card-all-draw-prizes .desc-info-card-all-draw-prizes {
+        max-width: 100%;
+    }
+    .section-faq {
+        padding-top: 60px;
+    }
+    .img-2-monthly-card-all-draw-prizes {
+        display: none;
+    }
+    .img-4-monthly-card-all-draw-prizes {
+        bottom: auto;
+        top: -40px;
+        right: auto;
+        left: -40px;
+        transform: rotate(150deg);
+    }
+    .img-3-monthly-card-all-draw-prizes {
+        bottom: auto;
+        top: -40px;
+        left: auto;
+        right: -20px;
+    }
+    #historyModal .modal-content {
+        padding: 24px;
+    }
+    #historyModal .zag-modal {
+        font-size: 24px;
+    }
+    #tasteModal .modal-content {
+        padding: 24px;
+    }
+    #tasteModal .zag-modal {
+        font-size: 24px;
+    }
+    #tasteModal .wrap-zag-modal {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    #tasteModal .card-count-collect-tatse-modal {
+        margin: 0 auto;
+    }
+    .card-collection-taste {
+        padding: 20px;
+    }
+    .card-collection-history-fruitcoins {
+        padding: 20px;
+    }
+    #checkModal .zag-modal {
+        font-size: 20px;
+    }
+    #manualModal .zag-modal {
+        font-size: 20px;
+    }
+    .section {
+        padding-top: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .value-card-main-prize {
+        font-size: 32px;
+        height: 80px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .zag-card-main-prize {
+        font-size: 32px;
+    }
+    #watchCheckModal .modal-content {
+        padding: 20px;
+    }
+    .table-history-checks-wrapper {
+        display: none;
+    }
+    .value-table-history-checks-message {
+        text-overflow: unset;
+        -webkit-line-clamp: unset;
+        -webkit-box-orient: unset;
+        overflow: unset;
+    }
+    .history-checks-wrapper-mobile {
+        display: flex!important;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        max-height: 520px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-red) var(--color-gray-card);
+    }
+    .history-checks-wrapper-mobile::-webkit-scrollbar {
+        width: 4px;
+    }
+    .history-checks-wrapper-mobile::-webkit-scrollbar-thumb {
+        background-color: var(--color-red);
+        border-radius: 4px;
+    }
+    .status-table-history-checks {
+        padding: 4px 10px 4px 6px;
+        font-size: 12px;
+        border-radius: 8px;
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+    .status-table-history-checks img {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Карточка чека — нейтральный фон для всех статусов, статус читается
+       по бейджу, а не по подсветке всей карточки */
+    .card-history-checks-mobile {
+        background-color: var(--color-white);
+        border: 1px solid #E6E8F0;
+        padding: 12px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+    }
+
+    .head-card-history-checks-mobile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        row-gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .head-card-history-checks-mobile .img-qr-check {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        flex: 0 0 auto;
+    }
+
+    .date-card-history-checks-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .label-card-history-checks-mobile {
+        color: #787E91;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 120%;
+    }
+
+    .rows-card-history-checks-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid #E6E8F0;
+    }
+
+    .row-card-history-checks-mobile {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .row-card-history-checks-mobile img {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
+    }
+
+    /* Подпись слева, значение прижато к правому краю — читается как таблица */
+    .row-card-history-checks-mobile .value-table-history-checks {
+        margin-left: auto;
+        text-align: right;
+        font-size: 14px;
+        min-width: 0;
+    }
+
+    /* Комментарий бывает длинным — выносим его под подпись на всю ширину */
+    .row-card-history-checks-mobile--message {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+
+    .head-row-card-history-checks-mobile {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .row-card-history-checks-mobile--message .value-table-history-checks {
+        margin-left: 26px;
+        text-align: left;
+    }
+    .stats-card-mini-info-user {
+        flex-direction: column;
+    }
+    .card-stats-card-mini-info-user {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .img-ellipse-card-mini-info-user {
+        height: 150%;
+        width: 100%;
+    }
+    .card-stats-card-history-checks {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .btn-register-check {
+        width: 100%;
+        justify-content: center;
+    }
+    .card-history-checks {
+        padding: 20px;
+    }
+    .card-stat-card-our-prizes {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .zag-all-draw-prizes, .zag-card-our-prizes, .zag-card-history-checks, .zag-section-faq {
+        font-size: 25px;
+    }
+    .zag-empty-history-checks {
+        font-size: 20px;
+    }
+    .swiper-slide-prizes {
+        width: 200px!important;
+    }
+    .wrap-img-card-prize-card-our-prizes {
+        height: 200px;
+    }
+    .card-time-verif-card-history-checks {
+        font-size: 14px;
+    }
+    #checkModal .modal-content, #manualModal .modal-content {
+        padding: 20px;
+    }
+    .card-history-checks .mb-5 {
+        margin-bottom: 16px!important;
+    }
+    .card-history-checks .mt-5 {
+        margin-top: 16px!important;
+    }
+    .collection-taste {
+        justify-content: center;
+    }
+    .item-right-info-card-all-draw-prizes img {
+        width: 100px;
+    }
+    .text-img-right-info-card-all-draw-prizes {
+        font-size: 16px;
+    }
+    .desc-item-right-info-card-all-draw-prizes {
+        font-size: 12px;
+    }
+    .card-all-draw-prizes.monthly {
+        min-height: 420px;
+    }
+    .img-11-card-quiz {
+        right: -30px;
+    }
+    .img-12-card-quiz {
+        left: -15px;
+    }
+    .img-4-card-quiz {
+        display: none;
+    }
+    .card-quiz {
+        min-height: 500px;
+    }
+    .img-1-card-quiz {
+        object-fit: contain;
+    }
+    .img-5-question-quiz {
+        display: none;
+    }
+    .img-2-question-quiz {
+        display: none;
+    }
+    .img-6-question-quiz {
+        display: none;
+    }
+    .img-7-question-quiz {
+        left: -20px;
+        width: 100px;
+        object-fit: contain;
+    }
+    .zag-question-quiz {
+        font-size: 20px;
+    }
+    .desc-card-quiz {
+        font-size: 20px;
+    }
+    .zag-card-quiz {
+        font-size: 32px;
+    }
+    .add-fruitcoins-card-quiz {
+        font-size: 24px;
+    }
+    .card-quiz {
+        align-items: center;
+    }
+    .list-all-draw-prizes {
+        margin-top: 24px;
+    }
+    /* max-width больше не нужен: обрезка работает за счёт min-width: 0
+       на .user-card-mini-info-user */
+    .email-card-mini-info-user {
+        font-size: 20px;
+    }
+
+    .head-card-mini-info-user {
+        row-gap: 16px;
+    }
+
+    /* Кнопка на всю ширину — крупнее тап-таргет и своя строка */
+    .btn-change-profile-card-mini-info-user {
+        width: 100%;
+        height: 46px;
+    }
+
+    .info-counts-obj-action {
+        margin-top: 20px;
+    }
+    .id-card-mini-info-user {
+        font-size: 14px;
+    }
+    .row-faq {
+        row-gap: 16px;
+        margin-top: 24px;
+    }
+    .zag-question-faq {
+        font-size: 16px;
+    }
+    .answer-faq-inner {
+        font-size: 14px;
+    }
+    .count-info-card-all-draw-prizes-final {
+        font-size: 16px;
+    }
+    .img-1-monthly-card-all-draw-prizes {
+        bottom: -265px;
+    }
+    .count-info-card-all-draw-prizes-final {
+        margin-top: 24px;
+    }
+    .desc-info-card-all-draw-prizes {
+        font-size: 12px;
+    }
+    .desc-all-draw-prizes {
+        font-size: 12px;
+    }
+    .quiz-result-text {
+        font-size: 14px;
+    }
+    .section {
+        padding-top: 24px;
+    }
+    .section-all-prizes {
+        padding-top: 60px;
+    }
+    .section-faq {
+        padding-top: 60px;
+    }
+    .section-first {
+        padding-top: 32px;
+    }
+    .gap-row-cards-obj-counts-action {
+        flex-direction: column;
+    }
+    .name-card-prize-card-our-prizes {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .item-right-info-card-all-draw-prizes img {
+        width: 70px;
+    }
+    .desc-item-right-info-card-all-draw-prizes {
+        font-size: 10px;
+    }
+    .text-img-right-info-card-all-draw-prizes {
+        font-size: 13px;
+    }
+    .right-info-card-all-draw-prizes {
+        gap: 8px;
+    }
+    .card-count-tickets {
+        padding: 10px;
+        padding-right: 14px;
+    }
+    .value-card-main-prize {
+        font-size: 24px;
+        height: 50px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .zag-card-main-prize {
+        font-size: 25px;
+    }
+    .zag-card-main-prize svg {
+        width: 14px;
+        height: 14px;
+    }
+    .card-main-prize {
+        padding: 16px;
+    }
+    .img-main-prize {
+        width: 100%;
+    }
+}

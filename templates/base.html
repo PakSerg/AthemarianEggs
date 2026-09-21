@@ -1,0 +1,69 @@
+{% load static %}<!DOCTYPE html>
+{% comment %}
+Каркас публичной части Акции «Купи и выиграй с Атемарской».
+
+Оформление вынесено в токены (static/css/landing/tokens.css) — в вёрстке нет
+ни одного фирменного цвета и ни одной фирменной картинки. Когда приедет
+брендбук, правится один файл с переменными, а не шаблоны.
+
+Лендинг и личный кабинет должны выглядеть одним сайтом, поэтому шапка и подвал
+здесь общие — те же partials подключает promotion/templates/base_promotion.html.
+{% endcomment %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="application-name" content="{{ company_info.promotion_name }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="{{ company_info.promotion_name }}">
+    <meta name="theme-color" content="#F2B705">
+
+    <title>{% if title %}{{ title }}{% else %}{{ seo_settings.title }}{% endif %}</title>
+    <meta name="description" content="{% if description %}{{ description }}{% else %}{{ seo_settings.description }}{% endif %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% if title %}{{ title }}{% else %}{{ seo_settings.title }}{% endif %}">
+    <meta property="og:description" content="{% if description %}{{ description }}{% else %}{{ seo_settings.description }}{% endif %}">
+    <meta property="og:site_name" content="{{ company_info.brand_name }}">
+    <meta property="og:locale" content="ru_RU">
+    {% if seo_settings.og_image %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ seo_settings.og_image.url }}">
+    {% endif %}
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicons/favicon.svg' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}">
+    <link rel="shortcut icon" href="{% static 'favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'favicons/site.webmanifest' %}">
+
+    {% block yandex_webmaster %}{% include 'seo/yandex_webmaster.html' %}{% endblock %}
+    {% include 'seo/yandex_metrika.html' %}
+
+    <link rel="stylesheet" href="{% static 'css/landing/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/landing/landing.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block header %}{% include 'partials/header.html' %}{% endblock %}
+
+<main id="main">
+    {% block content %}{% endblock %}
+</main>
+
+{% block footer %}{% include 'partials/footer.html' %}{% endblock %}
+
+{% include 'partials/win_prize_modal.html' %}
+{% include 'partials/instant_prize_modal.html' %}
+
+<script src="{% static 'js/landing/landing.js' %}" defer></script>
+<script src="{% static 'js/participants/instant-prizes.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

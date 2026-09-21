@@ -1,0 +1,11 @@
+User-agent: Yandex
+Disallow: /admin/
+Disallow: /participants/login/
+Allow: /
+
+User-agent: *
+Disallow: /admin/
+Disallow: /participants/login/
+Allow: /
+
+# Sitemap: {{ scheme }}://{{ domain }}/sitemap.xml

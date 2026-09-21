@@ -1,0 +1,44 @@
+{% load static %}
+{% comment %}
+Общая шапка лендинга и личного кабинета. Набор ссылок разный: в кабинете
+(is_participants) — кабинет/правила/профиль, на лендинге — якоря на секции.
+Логотипа в вёрстке нет: пока не загружен фирменный, показывается название
+акции текстом.
+{% endcomment %}
+<header class="header" data-header>
+    <div class="container header__inner">
+        <a class="header__logo" href="{% if is_participants %}{{ company_info.landing_url }}{% else %}{% url 'main:home' %}{% endif %}">
+            {{ company_info.brand_name }}
+        </a>
+
+        <button class="header__burger" type="button" data-header-toggle aria-label="Меню" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="header__nav" data-header-nav>
+            {% if is_participants %}
+                <a class="header__link {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}"
+                   href="{% url 'participants:dashboard' %}">Личный кабинет</a>
+                {% if company_info.rules %}
+                    <a class="header__link" href="{{ company_info.rules.url }}" target="_blank" rel="noopener">Правила</a>
+                {% endif %}
+                <a class="header__link {% if request.resolver_match.url_name == 'profile' %}is-active{% endif %}"
+                   href="{% url 'participants:profile' %}">Профиль</a>
+                <a class="header__link header__link--muted" href="{% url 'participants:logout' %}">Выйти</a>
+            {% else %}
+                <a class="header__link" href="#how-to-participate">Как участвовать</a>
+                <a class="header__link" href="#prizes">Призы</a>
+                <a class="header__link" href="#products">Товары</a>
+                <a class="header__link" href="#winners">Победители</a>
+                <a class="header__link" href="#faq">Вопросы</a>
+                {% if CABINET_ACCESSIBLE %}
+                    {% if request.user.is_authenticated %}
+                        <a class="button button--primary header__cta" href="{% url 'participants:dashboard' %}">Личный кабинет</a>
+                    {% else %}
+                        <a class="button button--primary header__cta" href="{% url 'participants:login' %}">Загрузить чек</a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </nav>
+    </div>
+</header>

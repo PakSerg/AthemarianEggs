@@ -1,0 +1,17 @@
+{% with block=blocks.rules %}
+{% if block %}
+<section class="section section--accent" id="rules">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Условия участия" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+        {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+
+        {% if company_info.rules %}
+        <div class="section__actions">
+            <a class="button button--ghost" href="{{ company_info.rules.url }}" target="_blank" rel="noopener">Полные правила акции</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

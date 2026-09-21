@@ -1,0 +1,164 @@
+{% extends 'base_promotion.html' %}
+{% load static %}
+
+{% block title %}{{ company_info.brand_name }} | Профиль участника{% endblock %}
+{% block meta_description %}Настройки профиля участника акции{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/participants/profile.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="zag-section">ПРОФИЛЬ</div>
+</div>
+
+<div class="container section">
+    <div class="card-profile">
+
+        <input type="hidden" name="reload_form_type" value="{{ reload_form_type }}">
+
+        <div class="change-forms-profile">
+            <div class="btn-change-forms-profile active" data-menu-form="main">Основные</div>
+            <div class="btn-change-forms-profile" data-menu-form="sucuri">Безопасность</div>
+            <div class="btn-change-forms-profile" data-menu-form="notifications">Уведомления на email</div>
+        </div>
+
+        <form method="post" class="form-profile" enctype="multipart/form-data" data-form="main" id="form-main">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="profile">
+
+            <div class="profile-grid">
+                <div class="profile-field">
+                    <div class="label">Имя <span class="required-star">*</span></div>
+                    {{ form_profile.first_name }}
+                </div>
+                <div class="profile-field">
+                    <div class="label">Фамилия <span class="required-star">*</span></div>
+                    {{ form_profile.last_name }}
+                </div>
+                <div class="profile-field">
+                    <div class="label-row">
+                        <div class="label">Отчество <span class="required-star" id="middle-name-star">*</span></div>
+                        <label class="no-middle-name-toggle">
+                            <input type="checkbox" class="no-middle-name-toggle__input" id="id_no_middle_name">
+                            <span class="no-middle-name-toggle__text">Отчество отсутствует</span>
+                        </label>
+                    </div>
+                    {{ form_profile.middle_name }}
+                </div>
+                <div class="profile-field">
+                    <div class="label">Телефон <span class="required-star">*</span></div>
+                    {{ form_profile.phone }}
+                </div>
+                <div class="profile-field">
+                    <div class="label">Почта <span class="required-star">*</span></div>
+                    {{ form_profile.email }}
+                </div>
+                <div class="profile-field">
+                    <div class="label">День рождения <span class="required-star">*</span></div>
+                    {{ form_profile.birth_date }}
+                </div>
+                <div class="profile-field">
+                    <div class="label">Город проживания <span class="required-star">*</span></div>
+                    <div class="city-autocomplete">
+                        {{ form_profile.city }}
+                        <div id="city-suggestions" class="city-suggestions-list"></div>
+                        <div id="city-field-error" class="city-field-error" role="alert" hidden></div>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <div class="label">Банк <span class="required-star">*</span></div>
+                    <div class="bank-autocomplete">
+                        {{ form_profile.bank }}
+                        {{ form_profile.bank_bik }}
+                        <div id="bank-suggestions" class="bank-suggestions-list"></div>
+                        <div id="bank-field-error" class="bank-field-error" role="alert" hidden></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="submit-btn">Сохранить изменения</button>
+                <div class="text-submit-policy">Вводя или изменяя данные в этих настройках, вы соглашаетесь с <a href="{% if company_info.privacy_policy %}{{ company_info.privacy_policy.url }}{% endif %}" target="_blank">правилами обработки персональных данных</a></div>
+            </div>
+
+        </form>
+
+        <form method="post" class="form-profile-sucuri" data-form="sucuri" id="form-sucuri" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="password">
+
+            <div class="profile-grid profile-grid-3">
+                <div class="profile-field">
+                    <div class="label">Текущий пароль</div>
+                    <div class="password-wrapper">
+                        {{ form_change_profile_password.old_password }}
+                        <i class="toggle-password fas fa-eye-slash" data-target="id_old_password"></i>
+                    </div>
+                    <div class="error-password">{{ form_change_profile_password.old_password.errors }}</div>
+                </div>
+
+                <div class="profile-field">
+                    <div class="label">Новый пароль</div>
+                    <div class="password-wrapper">
+                        {{ form_change_profile_password.new_password_1 }}
+                        <i class="toggle-password fas fa-eye-slash" data-target="id_new_password_1"></i>
+                    </div>
+                    <div class="error-password">{{ form_change_profile_password.new_password_1.errors }}</div>
+                </div>
+
+                <div class="profile-field">
+                    <div class="label">Подтверждение пароля</div>
+                    <div class="password-wrapper">
+                        {{ form_change_profile_password.new_password_2 }}
+                        <i class="toggle-password fas fa-eye-slash" data-target="id_new_password_2"></i>
+                    </div>
+                    <div class="error-password">{{ form_change_profile_password.new_password_2.errors }}</div>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="submit-btn">Изменить пароль</button>
+                <div class="text-submit-policy">Вводя или изменяя данные в этих настройках, вы соглашаетесь с <a href="{% if company_info.privacy_policy %}{{ company_info.privacy_policy.url }}{% endif %}" target="_blank">правилами обработки персональных данных</a></div>
+            </div>
+
+        </form>
+
+        <form method="post" class="form-profile-notifications" data-form="notifications" id="form-notifications" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="subscription">
+
+            <div class="profile-field notifications-field">
+                <label class="notifications-toggle">
+                    <span class="notifications-toggle__text">Получать письма о статусе чека (принят / отклонён)</span>
+                    <input
+                        class="notifications-toggle__input"
+                        type="checkbox"
+                        name="is_subscribed_receipt_emails"
+                        {% if participant.is_subscribed_receipt_emails %}checked{% endif %}
+                    >
+                </label>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="submit-btn">Сохранить</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.DADATA_TOKEN = "{{ dadata_token|default:''|escapejs }}";
+  window.SBP_BANKS_URL = "{% url 'participants:sbp-banks' %}";
+</script>
+<script src="{% static 'js/participants/profile.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/jquery.inputmask.min.js"></script>
+{% endblock %}

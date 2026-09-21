@@ -1,0 +1,102 @@
+{% load static panel_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Панель{% endblock %} | Атемарская Ферма</title>
+  <link rel="icon" type="image/x-icon" href="{% static_v 'img/panel/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  {% block extra_head %}{% endblock %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="{% static_v 'css/panel/dashboard.css' %}">
+</head>
+<body>
+  <header class="panel-header">
+    <div class="panel-header__inner">
+      <a href="{% url 'panel:receipts' %}" class="panel-logo">
+        <img src="{% static_v 'img/panel/logo.svg' %}" alt="Cheqly" class="panel-logo__img">
+      </a>
+      <nav class="panel-nav">
+        <a href="{% url 'panel:receipts' %}" class="{% if active_nav == 'receipts' %}is-active{% endif %}">Чеки</a>
+        <a href="{% url 'panel:prizes' %}" class="{% if active_nav == 'prizes' %}is-active{% endif %}">Призы</a>
+        <a href="{% url 'panel:instant_prizes' %}" class="{% if active_nav == 'instant' %}is-active{% endif %}">Моментальные</a>
+        <a href="{% url 'panel:participants' %}" class="{% if active_nav == 'participants' %}is-active{% endif %}">Участники</a>
+        <a href="{% url 'panel:winners' %}" class="{% if active_nav == 'winners' %}is-active{% endif %}">Победители</a>
+        <a href="{% url 'panel:analytics' %}" class="{% if active_nav == 'analytics' %}is-active{% endif %}">Аналитика</a>
+        {% if can_view_cyclops %}
+        <a href="{% url 'panel:cyclops' %}" class="{% if active_nav == 'cyclops' %}is-active{% endif %}">Cyclops</a>
+        {% endif %}
+      </nav>
+      <div class="panel-user">
+        <div class="panel-user__avatar">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.1665 16.6667V15.8333C4.1665 13.5321 6.03198 11.6667 8.33317 11.6667H11.6665C13.9677 11.6667 15.8332 13.5321 15.8332 15.8333V16.6667M13.3332 5.83333C13.3332 7.67428 11.8408 9.16667 9.99984 9.16667C8.15889 9.16667 6.6665 7.67428 6.6665 5.83333C6.6665 3.99238 8.15889 2.5 9.99984 2.5C11.8408 2.5 13.3332 3.99238 13.3332 5.83333Z" stroke="#514F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="panel-user__info">
+          <span class="panel-user__name">{{ request.user.get_full_name|default:request.user.email }}</span>
+          <form method="post" action="{% url 'panel:logout' %}" class="panel-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="panel-logout-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.5 8.16663L10.9596 7.70707C11.3501 7.31654 11.3501 6.68338 10.9596 6.29285L10.5 5.83329" stroke="#F04D4D" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round"/>
+                <path d="M11.0835 7L7.5835 7M2.3335 10.072V4.23869M9.3335 10.072C9.3335 10.7164 8.81116 11.2387 8.16683 11.2387H5.8335M9.3335 4.23869C9.3335 3.59436 8.81116 3.07203 8.16683 3.07203H5.8335M2.85301 11.585L4.01968 12.3628C4.79499 12.8797 5.8335 12.3239 5.8335 11.3921V2.91863C5.8335 1.98682 4.79499 1.43103 4.01968 1.9479L2.85301 2.72568C2.52845 2.94206 2.3335 3.30633 2.3335 3.69641V10.6143C2.3335 11.0044 2.52845 11.3687 2.85301 11.585Z" stroke="#F04D4D" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round"/>
+              </svg>
+              Выйти
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="panel-main">
+    {% comment %}Серверные messages показываются тостами (см. panel.js) — разметка
+    ниже только переносит их в JS и на экране не появляется.{% endcomment %}
+    {% if messages %}
+    <div id="panel-server-messages" hidden>
+      {% for message in messages %}
+      <div data-level="{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block modal_root %}{% endblock %}
+
+  <div class="panel-modal-backdrop" id="panel-modal-backdrop"></div>
+  <div class="panel-modal" id="panel-modal" role="dialog" aria-hidden="true" aria-modal="true">
+    <div id="panel-modal-content" class="panel-modal__content">
+      <div class="panel-drawer__loading">Загрузка…</div>
+    </div>
+  </div>
+
+  <div class="panel-lightbox-backdrop" id="panel-lightbox">
+    <button class="panel-lightbox__close" id="panel-lightbox-close" type="button">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <img class="panel-lightbox__img" id="panel-lightbox-img" src="" alt="Фото чека">
+  </div>
+
+  <div class="panel-confirm-backdrop" id="panel-confirm">
+    <div class="panel-confirm" role="alertdialog" aria-modal="true">
+      <p class="panel-confirm__text" id="panel-confirm-text"></p>
+      <div class="panel-confirm__actions">
+        <button type="button" class="panel-btn panel-btn--ghost" id="panel-confirm-no">Нет</button>
+        <button type="button" class="panel-btn" id="panel-confirm-yes">Да</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="{% static_v 'js/panel/panel.js' %}"></script>
+  <script src="{% static_v 'js/panel/panel_filters.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

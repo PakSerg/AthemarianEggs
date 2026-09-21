@@ -1,0 +1,64 @@
+{% if is_paginated or page_obj.paginator.num_pages > 1 %}
+<div class="panel-pagination">
+  <p class="panel-pagination__info">Показано {{ page_obj.start_index }}–{{ page_obj.end_index }} из {{ page_obj.paginator.count }}</p>
+
+  <nav class="panel-pagination__nav" aria-label="Пагинация">
+    {% if page_obj.has_previous %}
+    <a href="?{{ prev_page_link }}" class="panel-pagination__btn" aria-label="Назад">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    {% else %}
+    <span class="panel-pagination__btn panel-pagination__btn--disabled">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    {% endif %}
+
+    {% for page_num, page_link in page_items %}
+      {% if page_num == "…" %}
+      <span class="panel-pagination__ellipsis">…</span>
+      {% elif page_num == page_obj.number %}
+      <span class="panel-pagination__num panel-pagination__num--current">{{ page_num }}</span>
+      {% else %}
+      <a href="?{{ page_link }}" class="panel-pagination__num">{{ page_num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?{{ next_page_link }}" class="panel-pagination__btn" aria-label="Вперёд">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 4L12 9L7 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    {% else %}
+    <span class="panel-pagination__btn panel-pagination__btn--disabled">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 4L12 9L7 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    {% endif %}
+  </nav>
+
+  <div class="panel-pagination__per-page">
+    <span class="panel-pagination__per-page-label">На странице:</span>
+    <form method="get" class="panel-pagination__per-page-form">
+      {% for key, values in request.GET.lists %}
+        {% if key != "per_page" and key != "page" %}
+          {% for v in values %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}
+        {% endif %}
+      {% endfor %}
+      <div class="panel-custom-select panel-custom-select--compact" data-name="per_page" data-auto-submit>
+        <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+          <span class="panel-custom-select__value">{{ per_page }}</span>
+          <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="panel-custom-select__panel" hidden>
+          <ul class="panel-custom-select__list">
+            {% for opt in per_page_options %}
+            <li class="panel-custom-select__item{% if opt == per_page %} is-selected{% endif %}" data-value="{{ opt }}" data-label="{{ opt }}">
+              <span class="panel-custom-select__check"></span>{{ opt }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}

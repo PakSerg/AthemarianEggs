@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: atemar
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: atemar_1379!
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: redis-server --appendonly yes --replica-read-only no
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  backend:
+    build: .
+    entrypoint: /app/entrypoint.sh
+    volumes:
+      - .:/app
+      # Приватный RSA-ключ для подписи запросов в Точку (Cyclops) — в отдельном
+      # именованном томе, а не в репозитории: он не должен попадать в git и не
+      # должен теряться при пересоздании контейнеров. См. README, «Ключи Cyclops».
+      - cyclops_keys:/app/keys
+      - ./staticfiles:/var/www/static
+      - ./media:/app/media
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  celery:
+    build: .
+    entrypoint: ""
+    command: celery -A config worker -c 1 --prefetch-multiplier=1 --loglevel=info
+    volumes:
+      - .:/app
+      - cyclops_keys:/app/keys
+      - ./media:/app/media
+    depends_on:
+      - db
+      - redis
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    entrypoint: ""
+    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/app
+      - cyclops_keys:/app/keys
+    depends_on:
+      - redis
+      - backend
+      - db
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./staticfiles:/var/www/static
+      - ./media:/app/media
+      - '/etc/letsencrypt:/etc/letsencrypt:ro'
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+networks:
+  app_network:
+
+volumes:
+  postgres_data:
+  # Приватный ключ Cyclops. Заполняется один раз (см. README, «Ключи Cyclops»),
+  # переживает docker compose down/up и пересборку образов. Удаляется только
+  # явным `docker volume rm` — не удаляйте без резервной копии ключа.
+  cyclops_keys:

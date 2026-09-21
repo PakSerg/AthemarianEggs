@@ -1,0 +1,590 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div>
+      <h1>Аналитика</h1>
+      <p class="panel-muted">{{ analytics.date_from|date:"d.m.Y" }} — {{ analytics.date_to|date:"d.m.Y" }}</p>
+    </div>
+    <a href="{{ export_url }}" class="panel-btn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+        <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Скачать Excel
+    </a>
+  </div>
+
+  <form method="get" class="panel-analytics-period" id="panel-period-form">
+    <input type="hidden" id="drp-from" name="date_from" value="{{ filters.date_from }}">
+    <input type="hidden" id="drp-to" name="date_to" value="{{ filters.date_to }}">
+    <input type="hidden" id="drp-tab" name="tab" value="{{ filters.tab }}">
+    <div class="panel-analytics-period__picker-wrap">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="panel-analytics-period__icon">
+        <rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M2 7h12M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="drp-display" class="panel-analytics-period__input" readonly placeholder="Выберите период">
+    </div>
+    <button type="submit" class="panel-btn">Применить</button>
+  </form>
+
+  <div class="panel-tabs">
+    <nav class="panel-tabs__nav">
+      <button type="button" class="panel-tab-btn" data-tab="receipts">Чеки</button>
+      <button type="button" class="panel-tab-btn" data-tab="participants">Участники</button>
+      <button type="button" class="panel-tab-btn" data-tab="cities">Города</button>
+      <button type="button" class="panel-tab-btn" data-tab="stores">Магазины</button>
+      <button type="button" class="panel-tab-btn" data-tab="products">Товары</button>
+      <button type="button" class="panel-tab-btn" data-tab="payouts">Выплаты</button>
+    </nav>
+
+    {# ────────────── ЧЕКИ ────────────── #}
+    <div id="tab-receipts" class="panel-tab-panel panel-tab-panel--hidden">
+
+      <div class="panel-kpi-row">
+        <div class="panel-kpi-card panel-kpi-card--green">
+          <span class="panel-kpi-card__label">Процент одобрения <i class="panel-tip" data-tip="Доля подтверждённых и победных чеков от всех загруженных за период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.approval_rate }}%</strong>
+          <span class="panel-kpi-card__sub">из загруженных чеков</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Уникальных магазинов <i class="panel-tip" data-tip="Сколько разных магазинов встречается в подтверждённых и победных чеках">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.stores_total }}</strong>
+          <span class="panel-kpi-card__sub">в подтверждённых чеках</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Сумма чеков за период <i class="panel-tip" data-tip="Суммарная сумма всех загруженных чеков за выбранный период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.receipts_totals.amount_sum|floatformat:0 }} ₽</strong>
+          <span class="panel-kpi-card__sub">по всем чекам</span>
+        </div>
+      </div>
+
+      <div class="panel-summary-grid">
+        <div class="panel-summary-col">
+          <div class="panel-analytics-group">
+            <div class="panel-analytics-group__title">Чеки</div>
+            <div class="panel-inline-stats">
+              <div class="panel-inline-stat">
+                <span>Загружено всего</span>
+                <strong>{{ analytics.receipts_totals.total }}</strong>
+              </div>
+              <div class="panel-inline-stat panel-inline-stat--green">
+                <span>Подтверждено</span>
+                <strong>{{ analytics.receipts_totals.confirmed }}</strong>
+              </div>
+              <div class="panel-inline-stat panel-inline-stat--red">
+                <span>Отклонено</span>
+                <strong>{{ analytics.receipts_totals.rejected }}</strong>
+              </div>
+              <div class="panel-inline-stat">
+                <span>На проверке</span>
+                <strong>{{ analytics.receipts_totals.pending }}</strong>
+              </div>
+              <div class="panel-inline-stat">
+                <span>Заморожено</span>
+                <strong>{{ analytics.receipts_totals.frozen }}</strong>
+              </div>
+              <div class="panel-inline-stat panel-inline-stat--accent">
+                <span>Победных</span>
+                <strong>{{ analytics.receipts_totals.winner }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-analytics-group">
+        <div class="panel-analytics-group__title">Причины отклонения <i class="panel-tip" data-tip="Распределение отклонённых за период чеков по причине отказа">i</i></div>
+        <div class="panel-table-wrap">
+          <table class="panel-table panel-table--sortable">
+            <thead>
+              <tr>
+                <th>Причина</th>
+                <th class="panel-cell--num">Чеков</th>
+                <th class="panel-cell--num">% от отклонённых</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for reason in analytics.rejection_reasons %}
+              <tr>
+                <td>{{ reason.label }}</td>
+                <td class="panel-cell--num">{{ reason.count }}</td>
+                <td class="panel-cell--num">{{ reason.percent }}%</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" class="panel-empty">Отклонённых чеков за период нет</td></tr>
+              {% endfor %}
+              {% if analytics.rejection_reasons %}
+              <tr class="panel-total-row">
+                <td>Итого отклонено</td>
+                <td class="panel-cell--num">{{ analytics.receipts_totals.rejected }}</td>
+                <td class="panel-cell--num">100%</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th class="panel-cell--num">Всего</th>
+              <th class="panel-cell--num">На проверке</th>
+              <th class="panel-cell--num">Подтверждено</th>
+              <th class="panel-cell--num">Отклонено</th>
+              <th class="panel-cell--num">Заморожено</th>
+              <th class="panel-cell--num">Победные</th>
+              <th class="panel-cell--num">Сумма чеков, ₽</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in analytics.receipts_daily %}
+            <tr>
+              <td>{{ row.date|date:"d.m.Y" }}</td>
+              <td class="panel-cell--num">{{ row.total }}</td>
+              <td class="panel-cell--num">{{ row.pending }}</td>
+              <td class="panel-cell--num">{{ row.confirmed }}</td>
+              <td class="panel-cell--num">{{ row.rejected }}</td>
+              <td class="panel-cell--num">{{ row.frozen }}</td>
+              <td class="panel-cell--num">{{ row.winner }}</td>
+              <td class="panel-cell--num">{{ row.amount_sum|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="panel-total-row">
+              <td>Итого</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.total }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.pending }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.confirmed }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.rejected }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.frozen }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.winner }}</td>
+              <td class="panel-cell--num">{{ analytics.receipts_totals.amount_sum|floatformat:0 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# ────────────── УЧАСТНИКИ ────────────── #}
+    <div id="tab-participants" class="panel-tab-panel panel-tab-panel--hidden">
+
+      <div class="panel-kpi-row">
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Конверсия в чек <i class="panel-tip" data-tip="Доля участников, зарегистрировавшихся за период и загрузивших хотя бы один чек">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.conversion_rate }}%</strong>
+          <span class="panel-kpi-card__sub">из зарегистрированных за период</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Зарегистрировано <i class="panel-tip" data-tip="Участники, создавшие аккаунт за выбранный период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.participants_totals.registered }}</strong>
+          <span class="panel-kpi-card__sub">{{ analytics.participants_totals.active }} активных</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Уникальных городов <i class="panel-tip" data-tip="Из скольких разных городов есть зарегистрированные участники">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.cities_total }}</strong>
+          <span class="panel-kpi-card__sub">география участия</span>
+        </div>
+      </div>
+
+      <div class="panel-analytics-group">
+        <div class="panel-analytics-group__title">Воронка участия <i class="panel-tip" data-tip="Путь участников, зарегистрированных за период: от регистрации до победы">i</i></div>
+        <div class="panel-funnel">
+          <div class="panel-funnel__step">
+            <span class="panel-funnel__label">Зарегистрировались</span>
+            <strong class="panel-funnel__value">{{ analytics.funnel.registered }}</strong>
+            <span class="panel-funnel__pct panel-funnel__pct--base">100%</span>
+          </div>
+          <div class="panel-funnel__arrow">→</div>
+          <div class="panel-funnel__step">
+            <span class="panel-funnel__label">Загрузили чек</span>
+            <strong class="panel-funnel__value">{{ analytics.funnel.uploaded }}</strong>
+            <span class="panel-funnel__pct">{{ analytics.funnel.uploaded_pct }}%</span>
+          </div>
+          <div class="panel-funnel__arrow">→</div>
+          <div class="panel-funnel__step">
+            <span class="panel-funnel__label">Получили подтверждение</span>
+            <strong class="panel-funnel__value">{{ analytics.funnel.confirmed }}</strong>
+            <span class="panel-funnel__pct">{{ analytics.funnel.confirmed_pct }}%</span>
+          </div>
+          <div class="panel-funnel__arrow">→</div>
+          <div class="panel-funnel__step panel-funnel__step--winner">
+            <span class="panel-funnel__label">Победители</span>
+            <strong class="panel-funnel__value">{{ analytics.funnel.winners }}</strong>
+            <span class="panel-funnel__pct">{{ analytics.funnel.winners_pct }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-summary-grid">
+        <div class="panel-summary-col">
+          <div class="panel-analytics-group">
+            <div class="panel-analytics-group__title">Вовлечённость <i class="panel-tip" data-tip="Распределение участников (зарегистрированных к концу периода) по числу чеков, загруженных за период">i</i></div>
+            <div class="panel-inline-stats">
+              <div class="panel-inline-stat">
+                <span>Без чеков <i class="panel-tip" data-tip="Зарегистрированы к концу периода, но ни разу не загрузили чек за период">i</i></span>
+                <strong>{{ analytics.engagement.no_receipts }}</strong>
+              </div>
+              <div class="panel-inline-stat">
+                <span>1 чек</span>
+                <strong>{{ analytics.engagement.one }}</strong>
+              </div>
+              <div class="panel-inline-stat">
+                <span>2–3 чека</span>
+                <strong>{{ analytics.engagement.two_three }}</strong>
+              </div>
+              <div class="panel-inline-stat panel-inline-stat--accent">
+                <span>4+ чека</span>
+                <strong>{{ analytics.engagement.four_plus }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-summary-col">
+          <div class="panel-analytics-group">
+            <div class="panel-analytics-group__title">Активность по дням недели <i class="panel-tip" data-tip="В какие дни недели участники чаще всего загружают чеки">i</i></div>
+            <div class="panel-weekday-chart">
+              {% for day in analytics.weekday_activity %}
+              <div class="panel-weekday-col">
+                <span class="panel-weekday-count">{{ day.count }}</span>
+                <div class="panel-weekday-bar-wrap">
+                  <div class="panel-weekday-bar-fill"
+                    style="height: {% widthratio day.count analytics.weekday_max 72 %}px"></div>
+                </div>
+                <span class="panel-weekday-label">{{ day.day }}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th class="panel-cell--num">Зарегистрировано</th>
+              <th class="panel-cell--num">Активные</th>
+              <th class="panel-cell--num">Неактивные</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in analytics.participants_daily %}
+            <tr>
+              <td>{{ row.date|date:"d.m.Y" }}</td>
+              <td class="panel-cell--num">{{ row.registered }}</td>
+              <td class="panel-cell--num">{{ row.active }}</td>
+              <td class="panel-cell--num">{{ row.inactive }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="panel-total-row">
+              <td>Итого</td>
+              <td class="panel-cell--num">{{ analytics.participants_totals.registered }}</td>
+              <td class="panel-cell--num">{{ analytics.participants_totals.active }}</td>
+              <td class="panel-cell--num">{{ analytics.participants_totals.inactive }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# ────────────── ГОРОДА ────────────── #}
+    <div id="tab-cities" class="panel-tab-panel panel-tab-panel--hidden">
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead><tr><th>Город</th><th class="panel-cell--num">Участников</th><th class="panel-cell--num">Чеков</th><th class="panel-cell--num">Сумма чеков, ₽</th><th class="panel-cell--num">Сумма акционных, ₽</th></tr></thead>
+          <tbody>
+            {% for row in analytics.cities %}
+            <tr>
+              <td>{{ row.name }}</td>
+              <td class="panel-cell--num">{{ row.count }}</td>
+              <td class="panel-cell--num">{{ row.receipts_count }}</td>
+              <td class="panel-cell--num">{{ row.receipts_amount|floatformat:2 }}</td>
+              <td class="panel-cell--num">{{ row.promo_amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="panel-total-row"><td>Итого городов</td><td class="panel-cell--num">{{ analytics.cities_total }}</td><td class="panel-cell--num"></td><td class="panel-cell--num"></td><td class="panel-cell--num"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# ────────────── МАГАЗИНЫ ────────────── #}
+    <div id="tab-stores" class="panel-tab-panel panel-tab-panel--hidden">
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead><tr><th>Магазин</th><th>ИНН</th><th class="panel-cell--num">Чеков</th></tr></thead>
+          <tbody>
+            {% for row in analytics.stores %}
+            <tr><td>{{ row.name }}</td><td>{{ row.inn|default:"—" }}</td><td class="panel-cell--num">{{ row.count }}</td></tr>
+            {% empty %}
+            <tr><td colspan="3" class="panel-empty">Нет данных</td></tr>
+            {% endfor %}
+            <tr class="panel-total-row"><td colspan="2">Итого магазинов</td><td class="panel-cell--num">{{ analytics.stores_total }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# ────────────── ТОВАРЫ ────────────── #}
+    <div id="tab-products" class="panel-tab-panel panel-tab-panel--hidden">
+
+      <div class="panel-kpi-row">
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Уникальных товаров <i class="panel-tip" data-tip="Количество разных наименований среди акционных товаров за период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.products.unique_products }}</strong>
+          <span class="panel-kpi-card__sub">акционных наименований</span>
+        </div>
+        <div class="panel-kpi-card panel-kpi-card--green">
+          <span class="panel-kpi-card__label">Сумма акционных товаров <i class="panel-tip" data-tip="Совокупная стоимость всех отмеченных акционных товаров за период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.products.total_amount|floatformat:0 }} ₽</strong>
+          <span class="panel-kpi-card__sub">{{ analytics.products.total_quantity|floatformat:0 }} ед.</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Мода <i class="panel-tip" data-tip="Акционный товар, который встречается в наибольшем числе чеков">i</i></span>
+          <strong class="panel-kpi-card__value panel-kpi-card__value--text"
+            title="{{ analytics.products.mode_product }}">{{ analytics.products.mode_product }}</strong>
+          <span class="panel-kpi-card__sub">самый частый товар</span>
+        </div>
+      </div>
+
+      <div class="panel-summary-grid">
+        <div class="panel-summary-col">
+          <div class="panel-analytics-group">
+            <div class="panel-analytics-group__title">Показатели по чекам с акционными товарами</div>
+            <div class="panel-inline-stats">
+              <div class="panel-inline-stat">
+                <span>Чеков с акц. товарами</span>
+                <strong>{{ analytics.products.receipts_with_promo }}</strong>
+              </div>
+              <div class="panel-inline-stat">
+                <span>Среднее число ед. на чек</span>
+                <strong>{{ analytics.products.avg_items_per_receipt }}</strong>
+              </div>
+              <div class="panel-inline-stat panel-inline-stat--green">
+                <span>Средняя сумма на чек</span>
+                <strong>{{ analytics.products.avg_amount_per_receipt|floatformat:0 }} ₽</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead>
+            <tr>
+              <th>Товар</th>
+              <th class="panel-cell--num">Количество</th>
+              <th class="panel-cell--num">Сумма, ₽</th>
+              <th class="panel-cell--num">Чеков</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in analytics.products.products %}
+            <tr>
+              <td>{{ product.name }}</td>
+              <td class="panel-cell--num">{{ product.quantity|floatformat:0 }}</td>
+              <td class="panel-cell--num">{{ product.amount|floatformat:2 }}</td>
+              <td class="panel-cell--num">{{ product.receipts }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="panel-empty">Нет акционных товаров за период</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# ────────────── ВЫПЛАТЫ ────────────── #}
+    <div id="tab-payouts" class="panel-tab-panel panel-tab-panel--hidden">
+
+      <div class="panel-kpi-row">
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Выплат создано <i class="panel-tip" data-tip="Записи о выплате гарантированного приза, созданные за выбранный период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.payouts.total_count }}</strong>
+          <span class="panel-kpi-card__sub">на сумму {{ analytics.payouts.total_amount|floatformat:0 }} ₽</span>
+        </div>
+        <div class="panel-kpi-card panel-kpi-card--green">
+          <span class="panel-kpi-card__label">Выплачено <i class="panel-tip" data-tip="Выплаты со статусом «Выплачена», у которых дата выплаты попадает в выбранный период">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.payouts.paid_count }}</strong>
+          <span class="panel-kpi-card__sub">на сумму {{ analytics.payouts.paid_amount|floatformat:0 }} ₽</span>
+        </div>
+        <div class="panel-kpi-card">
+          <span class="panel-kpi-card__label">Среднее время до выплаты <i class="panel-tip" data-tip="Среднее время от создания записи о выплате до фактической выплаты">i</i></span>
+          <strong class="panel-kpi-card__value">{{ analytics.payouts.avg_payout_hours }} ч</strong>
+          <span class="panel-kpi-card__sub">от создания до выплаты</span>
+        </div>
+      </div>
+
+      <div class="panel-analytics-group">
+        <div class="panel-analytics-group__title">По статусам <i class="panel-tip" data-tip="Количество и сумма созданных за период выплат по каждому статусу">i</i></div>
+        <div class="panel-table-wrap">
+          <table class="panel-table panel-table--sortable">
+            <thead>
+              <tr>
+                <th>Статус</th>
+                <th class="panel-cell--num">Количество</th>
+                <th class="panel-cell--num">Сумма, ₽</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in analytics.payouts.status_breakdown %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td class="panel-cell--num">{{ row.count }}</td>
+                <td class="panel-cell--num">{{ row.amount|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+              <tr class="panel-total-row">
+                <td>Итого</td>
+                <td class="panel-cell--num">{{ analytics.payouts.total_count }}</td>
+                <td class="panel-cell--num">{{ analytics.payouts.total_amount|floatformat:0 }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel-table-wrap">
+        <table class="panel-table panel-table--sortable">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th class="panel-cell--num">Создано выплат</th>
+              <th class="panel-cell--num">Сумма созданных, ₽</th>
+              <th class="panel-cell--num">Выплачено</th>
+              <th class="panel-cell--num">Сумма выплаченного, ₽</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in analytics.payouts.daily %}
+            <tr>
+              <td>{{ row.date|date:"d.m.Y" }}</td>
+              <td class="panel-cell--num">{{ row.created_count }}</td>
+              <td class="panel-cell--num">{{ row.created_amount|floatformat:0 }} ₽</td>
+              <td class="panel-cell--num">{{ row.paid_count }}</td>
+              <td class="panel-cell--num">{{ row.paid_amount|floatformat:0 }} ₽</td>
+            </tr>
+            {% endfor %}
+            <tr class="panel-total-row">
+              <td>Итого</td>
+              <td class="panel-cell--num">{{ analytics.payouts.total_count }}</td>
+              <td class="panel-cell--num">{{ analytics.payouts.total_amount|floatformat:0 }} ₽</td>
+              <td class="panel-cell--num">{{ analytics.payouts.paid_count }}</td>
+              <td class="panel-cell--num">{{ analytics.payouts.paid_amount|floatformat:0 }} ₽</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>{# /panel-tabs #}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  var fromEl  = document.getElementById('drp-from');
+  var toEl    = document.getElementById('drp-to');
+  var tabEl   = document.getElementById('drp-tab');
+  var display = document.getElementById('drp-display');
+  var defaults = [];
+  if (fromEl.value) defaults.push(fromEl.value);
+  if (toEl.value)   defaults.push(toEl.value);
+  flatpickr(display, {
+    mode: 'range', dateFormat: 'Y-m-d',
+    altInput: true, altFormat: 'd.m.Y',
+    altInputClass: 'panel-analytics-period__input',
+    locale: 'ru',
+    defaultDate: defaults.length ? defaults : undefined,
+    onChange: function(dates) {
+      function localDate(d) {
+        if (!d) return '';
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      }
+      fromEl.value = dates[0] ? localDate(dates[0]) : '';
+      toEl.value   = dates[1] ? localDate(dates[1]) : '';
+    },
+    onReady: function(d, s, fp) { fp.altInput.readOnly = true; }
+  });
+
+  var btns   = document.querySelectorAll('.panel-tab-btn');
+  var panels = document.querySelectorAll('.panel-tab-panel');
+  var DEFAULT_TAB = 'receipts';
+
+  function activateTab(tabId) {
+    var found = Array.from(btns).some(function(b) { return b.dataset.tab === tabId; });
+    if (!found) tabId = DEFAULT_TAB;
+    btns.forEach(function(b) { b.classList.toggle('panel-tab-btn--active', b.dataset.tab === tabId); });
+    panels.forEach(function(p) { p.classList.toggle('panel-tab-panel--hidden', p.id !== 'tab-' + tabId); });
+    if (tabEl) tabEl.value = tabId;
+  }
+
+  var urlTab = new URLSearchParams(window.location.search).get('tab')
+            || '{{ filters.tab|escapejs }}'
+            || DEFAULT_TAB;
+  activateTab(urlTab);
+
+  btns.forEach(function(btn) {
+    btn.addEventListener('click', function() { activateTab(btn.dataset.tab); });
+  });
+
+  function parseCell(text) {
+    var dm = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (dm) return new Date(dm[3], dm[2]-1, dm[1]).getTime();
+    var n = parseFloat(text.replace(/[^0-9.-]/g, ''));
+    return isNaN(n) ? text.toLowerCase() : n;
+  }
+
+  // Сортировка ведёт себя как в Django Admin: нет → по возрастанию → по
+  // убыванию → снова нет (исходный порядок). Нейтральная стрелка ↕ в заголовке
+  // подсказывает, что колонку можно сортировать.
+  document.querySelectorAll('.panel-table--sortable').forEach(function(table) {
+    var ths = table.querySelectorAll('thead th');
+    var tbody = table.querySelector('tbody');
+    var originalOrder = Array.from(tbody.querySelectorAll('tr:not(.panel-total-row)'));
+
+    function render(rows) {
+      var totalRow = tbody.querySelector('.panel-total-row');
+      rows.forEach(function(r) { tbody.appendChild(r); });
+      if (totalRow) tbody.appendChild(totalRow);
+    }
+
+    ths.forEach(function(th, colIdx) {
+      th.tabIndex = 0;
+      th.setAttribute('role', 'button');
+      th.title = 'Сортировка: по возрастанию → по убыванию → без сортировки';
+      function toggle() {
+        var current = th.dataset.sort;
+        var dir = current === 'asc' ? 'desc' : (current === 'desc' ? '' : 'asc');
+        ths.forEach(function(h) { delete h.dataset.sort; });
+        if (!dir) { render(originalOrder.slice()); return; }
+        th.dataset.sort = dir;
+        var rows = originalOrder.slice();
+        rows.sort(function(a, b) {
+          var av = parseCell((a.cells[colIdx] || {}).textContent || '');
+          var bv = parseCell((b.cells[colIdx] || {}).textContent || '');
+          if (typeof av === 'string' && typeof bv === 'string') {
+            return dir === 'asc' ? av.localeCompare(bv, 'ru') : bv.localeCompare(av, 'ru');
+          }
+          return dir === 'asc' ? av - bv : bv - av;
+        });
+        render(rows);
+      }
+      th.addEventListener('click', toggle);
+      th.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  });
+})();
+</script>
+{% endblock %}

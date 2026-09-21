@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  {% if publish_week_url %}
+    <li>
+      <a href="{{ publish_week_url }}" class="addlink" onclick="return confirm('Опубликовать всех неопубликованных победителей{% if publish_week_num %} недели {{ publish_week_num }}{% endif %}?');">
+        Опубликовать неделю{% if publish_week_num %} {{ publish_week_num }}{% endif %}
+      </a>
+    </li>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if publish_week_hint %}
+    <p class="help">{{ publish_week_hint }}</p>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

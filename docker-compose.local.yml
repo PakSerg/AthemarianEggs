@@ -1,0 +1,109 @@
+version: '3.8'
+
+# Локальная разработка.
+# Отличия от prod:
+#   - DJANGO_SETTINGS_MODULE=config.settings_local (Email/Telegram/OkiDoki отключены)
+#   - код монтируется как volume — перезапуск не нужен при правке файлов
+#   - gunicorn заменён на runserver с авто-перезагрузкой
+#   - celery_beat не запускается
+#   - nginx слушает http://localhost (порт 80), конфиг nginx.local.conf
+#   - БД и Redis доступны с хоста на стандартных портах
+#
+# Запуск:
+#   docker compose -f docker-compose.local.yml up --build
+#
+# Остановка с удалением данных:
+#   docker compose -f docker-compose.local.yml down -v
+
+services:
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: atemar_local
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  backend:
+    build: .
+    entrypoint: ""
+    command: >
+      bash -c "
+        python manage.py migrate --noinput &&
+        python manage.py seed_receipt_messages &&
+        python manage.py seed_dev_data &&
+        python manage.py collectstatic --noinput &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings_local
+    volumes:
+      - .:/app
+      - ./media:/app/media
+      - staticfiles_local:/var/www/static
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  celery:
+    build: .
+    entrypoint: ""
+    command: celery -A config worker -c 1 --prefetch-multiplier=1 --loglevel=info
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings_local
+    volumes:
+      - .:/app
+      - ./media:/app/media
+    depends_on:
+      - db
+      - redis
+      - backend
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf:ro
+      - staticfiles_local:/var/www/static:ro
+      - ./media:/app/media:ro
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
+volumes:
+  postgres_data_local:
+  staticfiles_local:

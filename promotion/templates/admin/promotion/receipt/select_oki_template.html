@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+{% if templates %}
+<form method="post" action="{{ form_action }}">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+        <div class="form-row">
+            <div>
+                <label><strong>Шаблон договора:</strong></label>
+                <br><br>
+                {% for tpl in templates %}
+                <div style="margin-bottom: 10px;">
+                    <label style="cursor:pointer;">
+                        <input type="radio" name="template_id" value="{{ tpl.pk }}"
+                               {% if forloop.first %}checked{% endif %}
+                               style="margin-right: 8px;">
+                        <strong>{{ tpl.name }}</strong>
+                        &nbsp;
+                        <a href="{{ tpl.url }}" target="_blank" style="font-size:0.85em;">
+                            (открыть шаблон ↗)
+                        </a>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="submit-row" style="margin-top: 16px;">
+        <input type="submit" value="Создать договор" class="default">
+        &nbsp;
+        <a href="{{ back_url }}" class="button cancel-link">Отмена</a>
+    </div>
+</form>
+
+{% else %}
+<p style="color: #e74c3c;">
+    ⚠️ Нет активных шаблонов OkiDoki. 
+    Добавьте шаблоны в разделе 
+    <a href="{% url 'admin:promotion_okidokitemplate_changelist' %}">
+        Шаблоны договоров OkiDoki
+    </a>.
+</p>
+<p><a href="{{ back_url }}" class="button">← Назад</a></p>
+{% endif %}
+{% endblock %}

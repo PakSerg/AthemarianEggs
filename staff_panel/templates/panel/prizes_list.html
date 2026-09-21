@@ -1,0 +1,62 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Призы{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Призы</h1>
+      <p class="panel-muted">Всего: {{ page_obj.paginator.count }}</p>
+    </div>
+    <a href="{% url 'panel:prizes_export' %}?{{ request.GET.urlencode }}" class="panel-btn panel-btn--ghost">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+        <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Скачать Excel
+    </a>
+  </div>
+
+  {% include "panel/filters.html" %}
+
+  <div class="panel-table-wrap">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th class="panel-col-num panel-cell--num">№</th>
+          {% include "panel/sort_th.html" with col=sort_context.name label="Название" %}
+          {% include "panel/sort_th.html" with col=sort_context.type_prize label="Тип" %}
+          {% include "panel/sort_th.html" with col=sort_context.draw_period label="Период" %}
+          {% include "panel/sort_th.html" with col=sort_context.count label="Кол-во" align="right" %}
+          {% include "panel/sort_th.html" with col=sort_context.cost label="Стоимость, ₽" align="right" %}
+          <th class="panel-cell--center">Главный</th>
+          {% include "panel/sort_th.html" with col=sort_context.is_active label="Активен" align="center" %}
+          {% include "panel/sort_th.html" with col=sort_context.created_at label="Создан" %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for prize in prizes %}
+        <tr class="panel-table-row--clickable" data-url="{% url 'panel:prize_detail' prize.pk %}">
+          <td class="panel-col-num panel-cell--num panel-muted">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+          <td>{{ prize.name|default:"—" }}</td>
+          <td>{{ prize.type_prize|default:"—" }}</td>
+          <td>{% if prize.is_main %}—{% elif prize.draw_period == 'monthly' %}Ежемесячный · мес. {{ prize.month|default:"—" }}{% else %}Еженедельный · нед. {{ prize.week|default:"—" }}{% endif %}</td>
+          <td class="panel-cell--num">{{ prize.count|default_if_none:"—" }}</td>
+          <td class="panel-cell--num">{{ prize.cost|default_if_none:"—" }}</td>
+          <td class="panel-cell--center">{{ prize.is_main|yesno:"да,нет" }}</td>
+          <td class="panel-cell--center"><span class="panel-badge panel-badge--{% if prize.is_active %}confirmed{% else %}rejected{% endif %}">{{ prize.is_active|yesno:"да,нет" }}</span></td>
+          <td class="panel-nowrap">{{ prize.created_at|date:"d.m.Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="panel-empty">Призы не найдены</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "panel/pagination.html" %}
+  </div>
+</section>
+{% endblock %}
+
+{% block modal_root %}
+<div id="panel-modal-root" data-initial-url="{{ open_modal_url }}"></div>
+{% endblock %}

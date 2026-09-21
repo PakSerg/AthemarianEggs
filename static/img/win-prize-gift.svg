@@ -1,0 +1,34 @@
+<svg width="220" height="200" viewBox="0 0 220 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Подарок для модалки победы. Нарисован вектором, чтобы не тащить тяжёлый
+       3D-рендер: если дизайн отдаст готовый PNG/WEBP, достаточно заменить файл. -->
+  <defs>
+    <linearGradient id="giftBox" x1="40" y1="110" x2="180" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E51338"/>
+      <stop offset="1" stop-color="#B80527"/>
+    </linearGradient>
+    <linearGradient id="giftLid" x1="30" y1="86" x2="190" y2="122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F01A41"/>
+      <stop offset="1" stop-color="#C70A2E"/>
+    </linearGradient>
+    <linearGradient id="giftRibbonV" x1="96" y1="86" x2="124" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E4E7F1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Коробка и крышка -->
+  <rect x="42" y="112" width="136" height="78" rx="8" fill="url(#giftBox)"/>
+  <rect x="32" y="86" width="156" height="32" rx="8" fill="url(#giftLid)"/>
+
+  <!-- Лента -->
+  <rect x="96" y="112" width="28" height="78" fill="url(#giftRibbonV)"/>
+  <rect x="96" y="86" width="28" height="32" fill="#FFFFFF"/>
+
+  <!-- Бант: две петли, хвостики и узел -->
+  <path d="M110 86C110 86 96 84 84 78C66 69 56 56 62 46C68 36 86 40 96 52C104 62 109 74 110 86Z" fill="#FFFFFF"/>
+  <path d="M110 86C110 86 124 84 136 78C154 69 164 56 158 46C152 36 134 40 124 52C116 62 111 74 110 86Z" fill="#FFFFFF"/>
+  <path d="M110 86C109 74 104 62 96 52C90 44 82 40 75 41C84 44 92 52 98 62C104 72 108 80 110 86Z" fill="#E4E7F1"/>
+  <path d="M110 86C111 74 116 62 124 52C130 44 138 40 145 41C136 44 128 52 122 62C116 72 112 80 110 86Z" fill="#E4E7F1"/>
+  <ellipse cx="110" cy="86" rx="15" ry="12" fill="#FFFFFF"/>
+  <ellipse cx="110" cy="84" rx="8" ry="6" fill="#E4E7F1"/>
+</svg>

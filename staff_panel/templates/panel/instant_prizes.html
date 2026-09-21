@@ -1,0 +1,144 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Моментальные призы{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Моментальные призы</h1>
+      <p class="panel-muted">
+        Лоток яиц: {{ config.eggs_per_tray }} яиц, попыток за принятый чек — {{ config.attempts_per_receipt }}, игровое окно {{ config.day_start_hour }}:00–{{ config.day_end_hour }}:00.
+        {% if not config.is_enabled %}<b>Механика выключена.</b>{% endif %}
+      </p>
+    </div>
+    {% if not is_read_only_staff %}
+    <form method="post" action="{% url 'panel:instant_prizes_generate' %}">
+      {% csrf_token %}
+      <button type="submit" class="panel-btn">Пересобрать расписание</button>
+    </form>
+    {% endif %}
+  </div>
+
+  {# --- Фонд ------------------------------------------------------------- #}
+  <div class="panel-cards">
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.moments_total }}</div>
+      <div class="panel-card__label">Призовых моментов всего</div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.moments_claimed }}</div>
+      <div class="panel-card__label">Разыграно</div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.moments_left }}</div>
+      <div class="panel-card__label">Осталось в фонде</div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.moments_overdue }}</div>
+      <div class="panel-card__label">Наступили, но не пойманы</div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.attempts_played }} / {{ fund.attempts_total }}</div>
+      <div class="panel-card__label">Попыток сыграно</div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card__value">{{ fund.winners_total }}</div>
+      <div class="panel-card__label">Победителей</div>
+    </div>
+  </div>
+
+  {% if fund.moments_total == 0 %}
+  <p class="panel-alert panel-alert--warning">
+    Расписание призовых моментов не сгенерировано — лоток всегда будет пустым.
+    Заведите призы с периодичностью «Моментальный» (с неделей и количеством) и
+    нажмите «Пересобрать расписание».
+  </p>
+  {% endif %}
+
+  {# --- Призы ------------------------------------------------------------ #}
+  <h2 class="panel-section-title">Призовой фонд по неделям</h2>
+  <div class="panel-table-wrap">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th>Неделя</th>
+          <th>Приз</th>
+          <th>В плане</th>
+          <th>В расписании</th>
+          <th>Разыграно</th>
+          <th>Осталось</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in prizes %}
+        <tr{% if row.needs_regeneration %} class="is-warning"{% endif %}>
+          <td>{{ row.week|default:'—' }}</td>
+          <td>{{ row.prize.name }}</td>
+          <td>{{ row.planned }}</td>
+          <td>
+            {{ row.generated }}
+            {% if row.needs_regeneration %}<span class="panel-muted">— расписание устарело</span>{% endif %}
+          </td>
+          <td>{{ row.claimed }}</td>
+          <td>{{ row.left }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="panel-muted">Моментальных призов не заведено</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# --- Равномерность ----------------------------------------------------- #}
+  <h2 class="panel-section-title">Сколько призов уходит каждый день</h2>
+  <p class="panel-muted">
+    Столбик — количество призовых моментов на день. Высота столбиков должна быть
+    примерно одинаковой: именно так проверяется равномерность розыгрыша.
+  </p>
+  <div class="instant-chart">
+    {% for row in schedule %}
+    <div class="instant-chart__col{% if row.is_today %} is-today{% endif %}"
+         title="{{ row.day|date:'d.m.Y' }}: всего {{ row.total }}, разыграно {{ row.claimed }}">
+      <div class="instant-chart__bar" style="height: {{ row.share }}%">
+        <div class="instant-chart__bar-claimed"
+             style="height: {% widthratio row.claimed row.total 100 %}%"></div>
+      </div>
+      <div class="instant-chart__label">{{ row.day|date:'d.m' }}</div>
+    </div>
+    {% empty %}
+    <p class="panel-muted">Расписание пустое</p>
+    {% endfor %}
+  </div>
+
+  {# --- Последние выигрыши ------------------------------------------------ #}
+  <h2 class="panel-section-title">Последние выигрыши</h2>
+  <div class="panel-table-wrap">
+    <table class="panel-table">
+      <thead>
+        <tr><th>Когда</th><th>Участник</th><th>Приз</th><th>Чек</th></tr>
+      </thead>
+      <tbody>
+        {% for win in recent_wins %}
+        <tr>
+          <td>{{ win.created_at|date:'d.m.Y H:i' }}</td>
+          <td>
+            <a href="{% url 'panel:participant_detail' win.participant_id %}">
+              {{ win.participant.get_full_name|default:win.participant.email }}
+            </a>
+          </td>
+          <td>{{ win.prize.name }}</td>
+          <td>
+            {% if win.receipt_id %}
+              <a href="{% url 'panel:receipt_detail' win.receipt_id %}">чек №{{ win.receipt_id }}</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="panel-muted">Пока никто не выиграл</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

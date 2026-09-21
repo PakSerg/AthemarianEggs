@@ -1,0 +1,35 @@
+{% comment %}
+Победители. Группы недельных розыгрышей приходят из main.services.get_winners_by_months,
+каждая группа — отдельная вкладка. Публикуются только замаскированные данные (бриф, п. 8).
+{% endcomment %}
+{% with block=blocks.winners %}
+{% if block and winners %}
+<section class="section" id="winners">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Победители" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        <div class="winners" data-winners>
+            <div class="winners__tabs" role="tablist">
+                {% for group in winners %}
+                <button class="winners__tab {% if forloop.first %}is-active{% endif %}" type="button" role="tab" data-winners-tab="{{ group.key }}">{{ group.label }}</button>
+                {% endfor %}
+            </div>
+
+            {% for group in winners %}
+            <div class="winners__panel {% if not forloop.first %}is-hidden{% endif %}" data-winners-panel="{{ group.key }}">
+                <table class="winners__table">
+                    <thead><tr><th>Участник</th><th>Телефон</th><th>Приз</th></tr></thead>
+                    <tbody>
+                    {% for row in group.rows %}
+                    <tr><td>{{ row.name }}</td><td>{{ row.phone }}</td><td>{{ row.prize }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endwith %}

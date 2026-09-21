@@ -1,0 +1,53 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_title %}Чек принят — {{ site_name }}{% endblock %}
+
+{% block preheader %}
+<div style="display:none;max-height:0;overflow:hidden;">
+    Ваш чек на сумму {{ amount }} ₽ прошёл проверку и зарегистрирован в акции
+</div>
+{% endblock %}
+
+{% block email_content %}
+<h1 style="margin:0 0 16px 0;font-size:42px;line-height:1.2;font-weight:700;color:#FFFFFF;text-align:center;text-transform:uppercase;">
+    Чек принят
+</h1>
+<p style="margin:0 0 32px 0;font-size:24px;line-height:1.2;color:#C7CCDC;text-align:center;font-weight:350;">
+    Ваш чек прошёл проверку и зарегистрирован в акции.
+</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 32px 0;">
+    <tr>
+        <td align="center" style="background-color:#212B51;border-radius:18px;padding:36px;">
+            <p style="margin:0 0 8px 0;font-size:24px;font-weight:350;color:#C7CCDC;font-family:'Normalidad',Arial,sans-serif;">
+                Номер чека:
+            </p>
+            <p style="font-size:32px;line-height:1.3;font-weight:700;color:#FFFFFF;margin:0 0 16px 0;word-break:break-all;font-family:'Normalidad',Arial,sans-serif;">
+                {{ receipt_id }}
+            </p>
+            <span style="display:inline-block;font-size:18px;font-weight:500;color:#37CD1A;font-family:'Normalidad',Arial,sans-serif;">
+                <span style="display:inline-block;width:18px;height:18px;line-height:16px;border-radius:50%;border:2px solid #37CD1A;text-align:center;vertical-align:middle;margin-right:6px;">&#10003;</span>Одобрен
+            </span>
+        </td>
+    </tr>
+</table>
+<p style="margin:0 0 32px 0;font-size:24px;line-height:1.2;color:#C7CCDC;text-align:center;font-weight:350;">
+    Ваш чек учтён в розыгрыше акции
+</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 16px 0;">
+    <tr>
+        <td align="center">
+            <a href="{{ cabinet_url }}" style="background-color:#C4122F;color:#FFFFFF;font-size:24px;font-weight:500;text-decoration:none;padding:20px 32px;border-radius:10px;
+            display:block;width:100%;box-sizing:border-box;text-align:center;text-transform:uppercase;font-family:'Normalidad',Arial,sans-serif;">
+                Перейти в личный кабинет
+            </a>
+        </td>
+    </tr>
+</table>
+{% if unsubscribe_url %}
+<p style="text-align:center;margin:16px 0 0 0;">
+    <a href="{{ unsubscribe_url }}" style="display:inline-block;color:#8B93AD;font-family:'Normalidad',Arial,sans-serif;font-size:14px;font-weight:400;text-decoration:underline;">
+        Отписаться от писем о статусе чека
+    </a>
+</p>
+{% endif %}
+{% endblock %}

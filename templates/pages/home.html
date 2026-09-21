@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% comment %}
+Главная собирается из готовых секций. Лишняя секция выключается галочкой
+«Показывать» у своего блока в админке (main.ContentBlock) — удалять её из
+шаблона не нужно.
+{% endcomment %}
+
+{% block content %}
+    {% include 'partials/sections/hero.html' %}
+    {% include 'partials/sections/how_to_participate.html' %}
+    {% include 'partials/sections/instant_prizes.html' %}
+    {% include 'partials/sections/weekly_prizes.html' %}
+    {% include 'partials/sections/monthly_prizes.html' %}
+    {% include 'partials/sections/main_prize.html' %}
+    {% include 'partials/sections/products.html' %}
+    {% include 'partials/sections/winners.html' %}
+    {% include 'partials/sections/rules.html' %}
+    {% include 'partials/sections/faq.html' %}
+    {% include 'partials/sections/documents.html' %}
+    {% include 'partials/sections/contacts.html' %}
+{% endblock %}

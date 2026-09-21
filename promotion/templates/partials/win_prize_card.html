@@ -1,0 +1,48 @@
+{% load static %}
+{% comment %}
+Карточка выигранного приза в блоке «Ваши призы».
+Ожидает переменную card — promotion.services.winner_prize_status.PrizeCard.
+{% endcomment %}
+<div class="card-prize-card-our-prizes h-100">
+    <div class="wrap-img-card-prize-card-our-prizes">
+        <div class="badge-card-prize-card-our-prizes">
+            <img src="{% static 'img/participants/Gift.svg' %}" alt="">
+            Вы выиграли
+        </div>
+        <img src="{% if card.prize.image %}{{ card.prize.image.url }}{% else %}{% static 'img/participants/Gift.svg' %}{% endif %}" class="img-card-prize-card-our-prizes" alt="{{ card.prize.name|default:'Приз' }}">
+    </div>
+    <div class="body-card-prize-card-our-prizes">
+        <div class="mt-2 name-card-prize-card-our-prizes">{{ card.prize.name }}</div>
+        {% if card.prize.description %}
+        <div class="description-card-prize-card-our-prizes">{{ card.prize.description }}</div>
+        {% endif %}
+
+        <div class="info-card-prize-card-our-prizes">
+            <div class="row-info-card-prize-card-our-prizes">
+                <span class="label-row-info-card-prize-card-our-prizes">Дата покупки</span>
+                <span class="value-row-info-card-prize-card-our-prizes">{% if card.purchase_date %}{{ card.purchase_date|date:"H:i d.m.Y" }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="row-info-card-prize-card-our-prizes">
+                <span class="label-row-info-card-prize-card-our-prizes">Розыгрыш</span>
+                <span class="value-row-info-card-prize-card-our-prizes">{{ card.draw_label }}</span>
+            </div>
+
+            <div class="status-card-prize-card-our-prizes">
+                <div class="label-status-card-prize-card-our-prizes">Статус:</div>
+                <div class="text-status-card-prize-card-our-prizes">{{ card.status.text }}</div>
+                {% if card.status.has_link %}
+                {% comment %}
+                Стрелка вверх-вправо вместо иконки скачивания: ссылка уводит на договор
+                в OkiDoki или отдаёт файл приза — в обоих случаях это переход.
+                Подпись и стрелка стоят вплотную: лишний пробел в разметке на узкой
+                карточке сбрасывает стрелку на отдельную строку.
+                {% endcomment %}
+                <a href="{{ card.status.link_url }}" class="link-status-card-prize-card-our-prizes" target="_blank" rel="noopener noreferrer">{{ card.status.link_label }}<svg class="icon-link-status-card-prize-card-our-prizes" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M4.5 11.5L11.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5.75 4.5H11.5V10.25" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg></a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+{% extends "panel/base.html" %}
+{% load panel_extras %}
+
+{% block title %}Участники{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Участники</h1>
+      <p class="panel-muted">Всего: {{ page_obj.paginator.count }}</p>
+    </div>
+    <a href="{% url 'panel:participants_export' %}?{{ request.GET.urlencode }}" class="panel-btn panel-btn--ghost">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+        <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Скачать Excel
+    </a>
+  </div>
+
+  {% include "panel/filters.html" %}
+
+  <div class="panel-table-wrap">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          {% include "panel/sort_th.html" with col=sort_context.last_name label="ФИО" %}
+          {% include "panel/sort_th.html" with col=sort_context.email label="Email" %}
+          {% include "panel/sort_th.html" with col=sort_context.phone label="Телефон" %}
+          {% include "panel/sort_th.html" with col=sort_context.city label="Город" %}
+          {% include "panel/sort_th.html" with col=sort_context.receipts_count label="Чеков" align="right" %}
+          <th>Статус участия</th>
+          <th>Победитель</th>
+          {% include "panel/sort_th.html" with col=sort_context.created_at label="Регистрация" %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for participant in participants %}
+        <tr class="panel-table-row--clickable" data-url="{% url 'panel:participant_detail' participant.pk %}">
+          <td>
+            {{ participant|display_name:is_masked_user }}
+            {% if participant.is_blocked %}<span class="panel-badge panel-badge--rejected">Заблокирован</span>{% endif %}
+          </td>
+          <td>{{ participant.email|display_email:is_masked_user }}</td>
+          <td>{% if participant.phone %}{{ participant.phone|display_phone:is_masked_user }}{% else %}—{% endif %}</td>
+          <td>{{ participant.city|default:"—" }}</td>
+          <td class="panel-cell--num">{{ participant.receipts_count }}</td>
+          <td class="panel-muted">{{ participant.status_label }}</td>
+          <td>
+            {% if participant.is_weekly_winner %}<span class="panel-badge panel-badge--confirmed">Неделя</span>{% endif %}
+            {% if participant.is_main_winner %}<span class="panel-badge panel-badge--winner">Главный</span>{% endif %}
+            {% if not participant.is_weekly_winner and not participant.is_main_winner %}—{% endif %}
+          </td>
+          <td class="panel-nowrap">{{ participant.created_at|date:"d.m.Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="panel-empty">Участники не найдены</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "panel/pagination.html" %}
+  </div>
+</section>
+{% endblock %}
+
+{% block modal_root %}
+<div id="panel-modal-root" data-initial-url="{{ open_modal_url }}"></div>
+{% endblock %}

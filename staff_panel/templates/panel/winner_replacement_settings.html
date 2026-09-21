@@ -1,0 +1,39 @@
+<div class="panel-modal__header">
+  <div class="panel-modal__header-row">
+    <div class="panel-modal__identity">
+      <h2 class="panel-modal__title">Срок на подпись договора</h2>
+    </div>
+    <button class="panel-modal__close" id="panel-modal-close" type="button" title="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="panel-modal__body">
+  <div class="panel-modal__section">
+    <p class="panel-wr-alert">
+      Пока с момента отправки победителю письма с договором OkiDoki не прошёл этот срок,
+      заменить победителя в дашборде нельзя — ему даётся время подписать документ.
+      Если письмо ещё не отправлено (например, победитель не выходит на связь ещё
+      до выставления договора), это ограничение не действует — заменить можно сразу.
+      Подписанный договор по-прежнему блокирует замену без срока — это отдельное правило.
+    </p>
+
+    <form method="post" action="{{ form_action }}">
+      {% csrf_token %}
+      <div class="panel-field">
+        <label class="panel-field__label" for="id_sign_deadline_days">
+          Срок на подпись, дней
+          <i class="panel-tip" data-tip="0 отключает ограничение полностью: замена станет доступна сразу после отправки письма (до тех пор, пока договор не подписан).">i</i>
+        </label>
+        <input class="panel-field__input" type="number" id="id_sign_deadline_days"
+               name="sign_deadline_days" min="0" step="1"
+               value="{{ settings_obj.sign_deadline_days }}" required>
+        <p class="panel-field__hint">Например, 5 — победителю даётся 5 дней с момента отправки письма.</p>
+      </div>
+      <div class="panel-form-actions">
+        <button type="submit" class="panel-btn">Сохранить</button>
+      </div>
+    </form>
+  </div>
+</div>

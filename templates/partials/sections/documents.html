@@ -1,0 +1,17 @@
+{% with block=blocks.documents %}
+{% if block %}
+<section class="section" id="documents">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Документы" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        <ul class="documents">
+            {% if company_info.rules %}<li><a href="{{ company_info.rules.url }}" target="_blank" rel="noopener">Правила акции</a></li>{% endif %}
+            {% if company_info.privacy_policy %}<li><a href="{{ company_info.privacy_policy.url }}" target="_blank" rel="noopener">Политика обработки персональных данных</a></li>{% endif %}
+            {% if company_info.personal_data_consent %}<li><a href="{{ company_info.personal_data_consent.url }}" target="_blank" rel="noopener">Согласие на обработку персональных данных</a></li>{% endif %}
+            {% if company_info.products_list %}<li><a href="{{ company_info.products_list.url }}" target="_blank" rel="noopener">Перечень товаров акции</a></li>{% endif %}
+        </ul>
+    </div>
+</section>
+{% endif %}
+{% endwith %}

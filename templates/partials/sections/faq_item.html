@@ -1,0 +1,9 @@
+<div class="faq__item" data-accordion-item>
+    <button class="faq__question" type="button" data-accordion-trigger aria-expanded="false">
+        <span>{{ item.question }}</span>
+        <svg class="faq__chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M5 8L10 13L15 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <div class="faq__answer" data-accordion-panel hidden>{{ item.answer|linebreaks }}</div>
+</div>

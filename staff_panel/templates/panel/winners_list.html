@@ -1,0 +1,238 @@
+{% extends "panel/base.html" %}
+{% load panel_extras %}
+
+{% block title %}Победители{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Победители</h1>
+      <p class="panel-muted">Всего: {{ winners_count }}</p>
+    </div>
+    <div class="panel-page__head-actions">
+      <a href="{% url 'panel:prize_files' %}" class="panel-btn panel-btn--ghost">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+          <path d="M9 2H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M9 2v4h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Файлы призов
+      </a>
+      <a href="{% url 'panel:winners_export' %}?{{ request.GET.urlencode }}" class="panel-btn panel-btn--ghost">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+          <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Скачать Excel
+      </a>
+      {% if can_manage_prize_fulfillment %}
+      {# Срок на подпись, авто-раздача файлов и замена победителя — работа менеджера, #}
+      {# а не только суперюзера (см. staff_panel.services.access).                    #}
+      <button type="button" class="panel-btn panel-btn--ghost panel-open-modal-btn"
+              data-url="{% url 'panel:winner_replacement_settings' %}"
+              title="Срок, в течение которого победитель должен подписать договор — пока он не истёк (и письмо с договором уже отправлено), заменить победителя нельзя">
+        Срок на подпись: {% if replacement_settings.sign_deadline_days %}{{ replacement_settings.sign_deadline_days }} дн.{% else %}не ограничен{% endif %}
+      </button>
+      <button type="button" class="panel-btn panel-btn--ghost panel-open-modal-btn"
+              data-url="{% url 'panel:winner_auto_distribute' %}"
+              title="Автоматически выдаёт файлы электронных призов победителям выбранного розыгрыша">
+        Автоматическое распределение призов
+      </button>
+      {% endif %}
+      {% if not is_read_only_staff %}
+      <button type="button" class="panel-btn panel-open-modal-btn" data-url="{% url 'panel:winner_create' %}">Добавить победителя</button>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "panel/filters.html" %}
+
+  <div class="panel-table-wrap">
+    <table class="panel-table panel-table--compact">
+      <thead>
+        <tr>
+          {% include "panel/sort_th.html" with col=sort_context.created_at label="Дата" %}
+          {% include "panel/sort_th.html" with col=sort_context.draw_type label="Тип" %}
+          {% include "panel/sort_th.html" with col=sort_context.period label="Период" %}
+          {% include "panel/sort_th.html" with col=sort_context.participant label="ФИО" %}
+          {% include "panel/sort_th.html" with col=sort_context.prize label="Приз" %}
+          <th>Email</th>
+          {% include "panel/sort_th.html" with col=sort_context.stage label="Этап" title="На какой стадии находится текущий итог розыгрыша" %}
+          {% include "panel/sort_th.html" with col=sort_context.status label="Договор" %}
+          {% include "panel/sort_th.html" with col=sort_context.delivery_status label="Доставлено" %}
+          {% include "panel/sort_th.html" with col=sort_context.prize_file label="Файл приза" title="Файлы электронных призов — сертификаты и промокоды. Выдаются только победителям с электронным призом; свободные ищите на странице «Файлы призов» или раздайте через «Автоматическое распределение призов»" %}
+          {% include "panel/sort_th.html" with col=sort_context.email label="Письмо" %}
+          <th class="panel-cell--center">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in page_obj %}
+        <tr class="panel-table-row--clickable" data-url="{% url 'panel:winner_detail' row.kind row.pk %}">
+          <td class="panel-nowrap">{{ row.created_at|date:"d.m.Y" }}</td>
+          <td class="panel-nowrap">
+            {% if row.draw_type == 'main' %}
+            <span class="panel-badge panel-badge--winner" title="Главный розыгрыш">Главный</span>
+            {% elif row.draw_type == 'monthly' %}
+            <span class="panel-badge panel-badge--pending" title="Ежемесячный розыгрыш">Ежемес.</span>
+            {% else %}
+            <span class="panel-badge panel-badge--confirmed" title="Еженедельный розыгрыш">Еженед.</span>
+            {% endif %}
+          </td>
+          <td class="panel-nowrap">{{ row.period_label }}</td>
+          <td>
+            <div class="panel-participant-cell">
+              <div class="panel-participant-cell__avatar">{{ row.fio|first|upper }}</div>
+              <div class="panel-participant-cell__name">
+                {{ row.participant|display_name:is_masked_user }}
+                {% if row.replacements_count %}
+                <span class="panel-wr-tag panel-wr-tag--replaced" title="Победитель заменён, на лендинге остался объявленный изначально">замена ×{{ row.replacements_count }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td class="panel-cell--prize">{{ row.prize.name|default:"—" }}</td>
+          <td>
+            {% if row.email %}
+            <div class="panel-email-row">
+              <span>{{ row.email }}</span>
+              <button class="panel-copy-btn" data-copy="{{ row.email }}" title="Скопировать email" type="button" data-stop>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5.5" y="5.5" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 10.5H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4.5a2 2 0 0 1 2 2v1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+            {% else %}<span class="panel-muted">—</span>{% endif %}
+          </td>
+          <td class="panel-nowrap" data-stage-cell>
+            <span class="panel-badge panel-badge--{{ row.stage_color }}">{{ row.stage_label }}</span>
+          </td>
+          <td>
+            <div class="panel-stacked-cell">
+              {% if row.contract_link %}
+              <a href="{{ row.contract_link }}" class="panel-stacked-cell__link" target="_blank" rel="noopener"
+                 title="Открыть договор в OkiDoki" data-stop>
+                <span class="panel-badge panel-badge--{{ row.contract_status_class }}">{{ row.status_oki_document|default:"Создан" }}</span>
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M4.5 1.5H10.5V7.5M10.5 1.5L5 7M8 9.5v1H1.5v-8h1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              {% elif row.status_oki_document %}
+              <span class="panel-badge panel-badge--{{ row.contract_status_class }}">{{ row.status_oki_document }}</span>
+              {% else %}
+              <span class="panel-muted">—</span>
+              {% endif %}
+              {% if row.contract_issued_at %}
+              <span class="panel-cell-meta" title="Когда договор был выставлен">{{ row.contract_issued_at|date:"d.m.Y H:i" }}</span>
+              {% elif row.is_contract_issued %}
+              <span class="panel-cell-meta" title="Договор выставлен до того, как дашборд начал сохранять дату выставления">дата не сохранена</span>
+              {% endif %}
+            </div>
+          </td>
+          {% if not can_manage_prize_fulfillment %}
+          <td>
+            {% if row.delivery_status %}
+            <span class="panel-badge panel-badge--{{ row.delivery_color }}">{{ row.delivery_status }}</span>
+            {% else %}<span class="panel-muted">—</span>{% endif %}
+          </td>
+          {% else %}
+          <td class="panel-editable-cell" data-stop data-editable-field="delivery_status" data-update-url="{% url 'panel:winner_update_field' row.kind row.pk %}">
+            <div class="panel-table-select">
+              <button type="button" class="panel-table-select__trigger" aria-expanded="false">
+                <span class="panel-table-select__value{% if row.delivery_status %} panel-table-select__value--{{ row.delivery_color }}{% else %} panel-table-select__value--empty{% endif %}" data-raw="{{ row.delivery_status|default:'' }}">{{ row.delivery_status|default:"Не выбрано" }}</span>
+                <svg class="panel-table-select__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="panel-table-select__panel" hidden>
+                <input type="text" class="panel-table-select__input" placeholder="Другое значение…" value="{{ row.delivery_status|default:'' }}">
+                <ul class="panel-table-select__list">
+                  <li class="panel-table-select__item panel-table-select__item--empty" data-value="">Не выбрано</li>
+                  {% for value, color in delivery_status_choices %}
+                  <li class="panel-table-select__item panel-table-select__item--{{ color }}" data-value="{{ value }}">{{ value }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </td>
+          {% endif %}
+
+          {% if not can_manage_prize_fulfillment %}
+          <td>
+            {% if row.prize_file %}
+            <a href="{% url 'panel:prize_file_download' row.prize_file.pk %}" data-stop>{{ row.prize_file.name }}</a>
+            {% else %}<span class="panel-muted">—</span>{% endif %}
+          </td>
+          {% elif not row.prize.is_electronic and not row.prize_file %}
+          <td class="panel-muted" title="Приз не электронный — файл приза не выдаётся">—</td>
+          {% else %}
+          <td class="panel-editable-cell" data-stop data-editable-field="prize_file"
+              data-update-url="{% url 'panel:winner_update_field' row.kind row.pk %}"
+              data-options-url="{% url 'panel:winner_prize_file_options' row.kind row.pk %}"
+              data-delivery-status="{{ row.delivery_status|default:'' }}">
+            <div class="panel-file-cell">
+              <div class="panel-table-select panel-table-select--files">
+                <button type="button" class="panel-table-select__trigger" aria-expanded="false">
+                  <span class="panel-table-select__value{% if row.prize_file %} panel-table-select__value--blue{% else %} panel-table-select__value--empty{% endif %}" data-raw="{{ row.prize_file_name }}" data-file-id="{{ row.prize_file.pk|default:'' }}" title="{{ row.prize_file_name|default:'' }}">{{ row.prize_file_name|default:"Не выдан" }}</span>
+                  <svg class="panel-table-select__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="panel-table-select__panel" hidden>
+                  <input type="text" class="panel-table-select__input" placeholder="Поиск по имени файла…" autocomplete="off">
+                  <ul class="panel-table-select__list panel-table-select__list--files"></ul>
+                  <button type="button" class="panel-file-select__clear" hidden>Снять файл с победителя</button>
+                </div>
+              </div>
+              <a class="panel-file-cell__download" data-stop target="_blank" title="Скачать файл приза"
+                 href="{% if row.prize_file %}{% url 'panel:prize_file_download' row.prize_file.pk %}{% else %}#{% endif %}"
+                 {% if not row.prize_file %}hidden{% endif %}>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </td>
+          {% endif %}
+          <td>
+            <div class="panel-stacked-cell">
+              {% if row.is_send_email %}
+              <span class="panel-badge panel-badge--green">Отправлено</span>
+              {% if row.email_sent_at %}
+              <span class="panel-cell-meta" title="Когда письмо с договором было отправлено">{{ row.email_sent_at|date:"d.m.Y H:i" }}</span>
+              {% else %}
+              <span class="panel-cell-meta" title="Письмо отправлено до того, как дашборд начал сохранять дату отправки">дата не сохранена</span>
+              {% endif %}
+              {% else %}
+              <span class="panel-badge panel-badge--gray">Не отправлено</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="panel-actions-cell panel-cell--center" data-stop>
+            <div class="panel-actions-cell__inner">
+              <button type="button" class="panel-drawer__icon-btn panel-open-modal-btn"
+                      data-url="{% url 'panel:participant_detail' row.participant.pk %}"
+                      title="Карточка участника" data-stop>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+              {% if can_manage_prize_fulfillment %}
+                {% if row.can_replace %}
+                <button type="button" class="panel-btn panel-btn--small panel-btn--ghost panel-open-modal-btn"
+                        data-url="{% url 'panel:winner_replace' row.kind row.pk %}" data-stop
+                        title="Победителя можно заменить: договор ещё не подписан{% if row.is_send_email %}, срок на подпись истёк{% endif %}">Заменить</button>
+                {% else %}
+                <span class="panel-muted" title="{{ row.replace_block_reason }}">—</span>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="12" class="panel-empty">Победители не найдены</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "panel/pagination.html" %}
+  </div>
+</section>
+{% endblock %}
+
+{% block modal_root %}
+<div id="panel-modal-root" data-initial-url="{{ open_modal_url }}"></div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% load static panel_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход в панель | Атемарская Ферма</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/panel/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{% static_v 'css/panel/dashboard.css' %}">
+</head>
+<body class="panel-login-page">
+
+  <header class="panel-login-header">
+    <span class="panel-logo__text" style="font-size:22px;font-weight:700;color:#1a1a2e">Атемарская Ферма</span>
+  </header>
+
+  <div class="panel-login-wrap">
+    <div class="panel-login-card">
+      <div class="panel-login-card__header">
+        <h1 class="panel-login-card__title">Панель управления</h1>
+        <p class="panel-login-card__subtitle">Войдите в аккаунт, используя логин и пароль администратора</p>
+      </div>
+
+      {% if messages %}
+      <div class="panel-messages">
+        {% for message in messages %}
+        <div class="panel-message panel-message--{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" class="panel-login-form">
+        {% csrf_token %}
+        <div class="panel-login-field">
+          <label class="panel-login-field__label" for="id_email">Email</label>
+          <input class="panel-login-field__input" type="email" id="id_email" name="email" required autofocus autocomplete="username" placeholder="you@example.com">
+        </div>
+        <div class="panel-login-field">
+          <label class="panel-login-field__label" for="id_password">Пароль</label>
+          <input class="panel-login-field__input" type="password" id="id_password" name="password" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <div class="panel-login-submit">
+          <button type="submit" class="panel-btn panel-btn--block panel-btn--lg">Войти</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

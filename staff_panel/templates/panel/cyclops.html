@@ -1,0 +1,776 @@
+{% extends 'panel/base.html' %}
+{% block title %}Cyclops{% endblock %}
+
+{% block extra_head %}
+<style>
+  html { scroll-behavior:smooth; }
+  .cyc-section { background:#fff; border:1px solid #e6e6ec; border-radius:12px; padding:20px 24px; margin-bottom:20px; scroll-margin-top:80px; }
+  .cyc-section h2 { font-size:18px; margin:0 0 4px; }
+  .cyc-section .cyc-sub { color:#8a8896; font-size:13px; margin:0 0 16px; }
+  .cyc-row { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; }
+  .cyc-field { display:flex; flex-direction:column; gap:4px; }
+  .cyc-field label { font-size:12px; color:#514f5b; }
+  .cyc-field input, .cyc-field select { padding:8px 10px; border:1px solid #d7d7de; border-radius:8px; font-size:14px; min-width:180px; }
+  .cyc-btn { padding:9px 16px; border:none; border-radius:8px; background:#e2333a; color:#fff; font-size:14px; cursor:pointer; }
+  .cyc-btn--ghost { background:#f2f2f5; color:#333; }
+  .cyc-table-wrap { overflow-x:auto; }
+  .cyc-table { width:100%; border-collapse:collapse; font-size:13px; margin-top:12px; white-space:nowrap; }
+  .cyc-table th, .cyc-table td { text-align:left; padding:10px 14px; border-bottom:1px solid #eee; vertical-align:top; }
+  .cyc-table th { color:#8a8896; font-weight:600; }
+  /* Числовые колонки — по правому краю и моноширинными цифрами; заголовок
+     выравнивается так же, как значения под ним. */
+  .cyc-table th.cyc-cell--num, .cyc-table td.cyc-cell--num {
+    text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .cyc-th.cyc-cell--num a { justify-content:flex-end; }
+  .cyc-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; }
+  .cyc-badge--ok { background:#e6f6ec; color:#1a8a4a; }
+  .cyc-badge--no { background:#fdecec; color:#c0392b; }
+  .cyc-badge--wait { background:#fff4e0; color:#a86400; }
+  .cyc-layer { display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center; padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:20px; }
+  .cyc-layer strong { font-size:13px; }
+  .cyc-layer span { opacity:.85; }
+  .cyc-layer--prod { background:#fdecec; color:#8f2019; border:1px solid #f3c3c0; }
+  .cyc-layer--pre { background:#f2f2f5; color:#514f5b; border:1px solid #e0e0e6; }
+  .cyc-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .cyc-tabs a { padding:6px 12px; border-radius:8px; background:#f2f2f5; color:#333; text-decoration:none; font-size:13px; }
+  .cyc-empty { color:#8a8896; font-size:13px; padding:8px 0; }
+  /* searchable select */
+  .cyc-ss { position:relative; min-width:220px; }
+  .cyc-ss__input { width:100%; padding:8px 10px; border:1px solid #d7d7de; border-radius:8px; font-size:14px; box-sizing:border-box; cursor:text; }
+  .cyc-ss__panel { position:absolute; z-index:20; top:calc(100% + 2px); left:0; right:0; max-height:240px; overflow-y:auto; background:#fff; border:1px solid #d7d7de; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); }
+  .cyc-ss__item { padding:8px 10px; font-size:13px; cursor:pointer; }
+  .cyc-ss__item:hover { background:#f5f5f8; }
+  .cyc-ss__item.is-sel { background:#fdecec; color:#c0392b; }
+  .cyc-ss__empty { padding:8px 10px; font-size:13px; color:#8a8896; }
+  .cyc-badge--mute { background:#f2f2f5; color:#514f5b; }
+  .cyc-section__head { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:space-between; }
+  .cyc-btn--icon { display:inline-flex; align-items:center; gap:6px; text-decoration:none; white-space:nowrap; }
+  /* Сводка по выплатам */
+  .cyc-kpis { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin:16px 0 12px; }
+  .cyc-kpi { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border:1px solid #e6e6ec; border-left-width:3px; border-radius:10px; background:#fafafc; }
+  .cyc-kpi--ok { border-left-color:#1a8a4a; }
+  .cyc-kpi--wait { border-left-color:#a86400; }
+  .cyc-kpi--no { border-left-color:#c0392b; }
+  .cyc-kpi__label { font-size:12px; color:#8a8896; }
+  .cyc-kpi__value { font-size:24px; font-weight:600; line-height:1.1; }
+  .cyc-kpi__sub { font-size:12px; color:#8a8896; }
+  /* Разбивка по состояниям — она же быстрый фильтр */
+  .cyc-stages { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .cyc-stage { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:20px; border:1px solid transparent; font-size:12px; text-decoration:none; }
+  .cyc-stage__count { font-weight:700; }
+  .cyc-stage--ok { background:#e6f6ec; color:#1a8a4a; }
+  .cyc-stage--no { background:#fdecec; color:#c0392b; }
+  .cyc-stage--wait { background:#fff4e0; color:#a86400; }
+  .cyc-stage--mute { background:#f2f2f5; color:#514f5b; }
+  .cyc-stage.is-selected { border-color:currentColor; box-shadow:0 0 0 1px currentColor inset; }
+  /* Легенда состояний */
+  .cyc-legend { margin-bottom:16px; font-size:13px; }
+  .cyc-legend summary { cursor:pointer; color:#514f5b; }
+  .cyc-legend dl { display:grid; grid-template-columns:minmax(180px, max-content) 1fr; gap:6px 14px; margin:12px 0 0; }
+  .cyc-legend dt { margin:0; }
+  .cyc-legend dd { margin:0; color:#514f5b; }
+  .cyc-legend p { color:#8a8896; margin:12px 0 0; }
+  /* Фильтры раздела */
+  .cyc-filters { display:flex; flex-direction:column; gap:12px; padding:14px 16px; border:1px solid #e6e6ec; border-radius:10px; margin-bottom:16px; }
+  .cyc-field--wide input { min-width:320px; }
+  .cyc-field--full { width:100%; }
+  .cyc-checks { display:flex; flex-wrap:wrap; gap:6px 16px; }
+  .cyc-check { display:inline-flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; }
+  .cyc-check input { width:15px; height:15px; min-width:0; }
+  /* Таблица выплат */
+  .cyc-th a { color:#8a8896; text-decoration:none; }
+  .cyc-th.is-sorted a { color:#e2333a; }
+  .cyc-th__arrow { opacity:.6; }
+  .cyc-link { background:none; border:none; padding:0; font:inherit; color:#e2333a; cursor:pointer; text-align:left; }
+  .cyc-link:hover { text-decoration:underline; }
+  .cyc-cell-sub { color:#8a8896; font-size:12px; margin-top:2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="panel-page">
+  <h1 style="font-size:22px;margin:0 0 6px;">Cyclops · Точка Банк</h1>
+  <p style="color:#8a8896;margin:0 0 12px;">Управление выплатами гарантированного приза через СБП.</p>
+
+  {# Какой слой Точки сейчас подключён: на боевом каждое действие здесь двигает реальные деньги. #}
+  <div class="cyc-layer {% if cyclops_is_prod %}cyc-layer--prod{% else %}cyc-layer--pre{% endif %}">
+    <strong>
+      {% if cyclops_is_prod %}Боевой слой (prod) — операции с реальными деньгами{% else %}Тестовый слой (pre){% endif %}
+    </strong>
+    <span>{{ cyclops_base_url }}</span>
+    <span>Номинальный счёт: {{ nominal_account|default:'—' }}</span>
+    <span>Отпечаток: {{ cyclops_thumbprint|default:'—' }}</span>
+  </div>
+
+  <div class="cyc-tabs">
+    <a href="#payer">Плательщик</a>
+    <a href="#beneficiaries">Бенефициары</a>
+    <a href="#payments">Платежи</a>
+    <a href="#payouts">Выплаты приза</a>
+  </div>
+
+  {# ---------------------------- Плательщик (read-only) ---------------------------- #}
+  <section class="cyc-section" id="payer">
+    <h2>Плательщик</h2>
+    <p class="cyc-sub">
+      Бенефициар и виртуальный счёт, с которого выплачивается призовой фонд. Настраивается
+      напрямую в БД/админке.
+      {% if settings_obj.is_payout_configured %}
+        <span class="cyc-badge cyc-badge--ok">Плательщик настроен</span>
+      {% else %}
+        <span class="cyc-badge cyc-badge--no">Плательщик не настроен</span>
+      {% endif %}
+      {% if settings_obj.payout_enabled %}
+        <span class="cyc-badge cyc-badge--ok">Выплаты включены</span>
+      {% else %}
+        <span class="cyc-badge cyc-badge--wait">Выплаты приостановлены</span>
+      {% endif %}
+    </p>
+    <div class="cyc-row">
+      <div class="cyc-field">
+        <label>Бенефициар-плательщик</label>
+        <div>{{ settings_obj.payout_beneficiary.name|default:'— не выбран —' }}</div>
+      </div>
+      <div class="cyc-field">
+        <label>Виртуальный счёт</label>
+        <div>{{ settings_obj.payout_virtual_account.virtual_account_id|default:'— не выбран —' }}</div>
+      </div>
+      <div class="cyc-field">
+        <label>Средства на виртуальных счетах плательщика</label>
+        <div style="font-size:18px;font-weight:600;">{{ payer_total_balance }}₽</div>
+      </div>
+    </div>
+  </section>
+
+  {% comment %}
+    Ниже закомментированы разделы «Настройки плательщика», «Банки СБП»,
+    «Регистрация нового бенефициара» и «Тестовая выплата участнику» — по
+    заданию скрыты из интерфейса (плательщик теперь read-only блок «Плательщик»
+    выше). Управление, если понадобится, — через Django admin или напрямую в БД.
+  {% endcomment %}
+  {% comment %}
+  <section class="cyc-section" id="settings">
+    <h2>Настройки плательщика</h2>
+    <p class="cyc-sub">
+      Бенефициар и его виртуальный счёт, с которого выплачивается призовой фонд.
+      {% if settings_obj.is_payout_configured %}
+        <span class="cyc-badge cyc-badge--ok">Плательщик настроен</span>
+      {% else %}
+        <span class="cyc-badge cyc-badge--no">Плательщик не настроен</span>
+      {% endif %}
+      {% if settings_obj.payout_enabled %}
+        <span class="cyc-badge cyc-badge--ok">Выплаты включены</span>
+      {% else %}
+        <span class="cyc-badge cyc-badge--wait">Выплаты приостановлены</span>
+      {% endif %}
+    </p>
+    <p class="cyc-sub">
+      Документ-основание для сделки — Реестр выплат (Excel, форма согласована с ООО «Хелиос»):
+      при ручной точечной выплате создаётся реестр на одного участника, при плановой рассылке —
+      один реестр сразу на всех накопившихся за период. Один и тот же файл реестра прикладывается
+      ко всем сделкам участников, попавших в него. Шаблон ниже используется только для ручной
+      загрузки, если понадобится (сейчас не задействован генерацией).
+      <a href="{% url 'panel:cyclops_service_agreement_preview' %}" target="_blank" class="cyc-btn cyc-btn--ghost" style="display:inline-block;padding:4px 10px;font-size:12px;">Скачать пример реестра</a>
+    </p>
+    <form method="post" action="{% url 'panel:cyclops_settings' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="cyc-row">
+        <div class="cyc-field">
+          <label>Бенефициар-плательщик</label>
+          <select name="payout_beneficiary" id="cyc-payout-beneficiary">
+            <option value="">— не выбран —</option>
+            {% for b in beneficiaries %}
+              <option value="{{ b.pk }}" {% if settings_obj.payout_beneficiary_id == b.pk %}selected{% endif %}>{{ b.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="cyc-field">
+          <label>Виртуальный счёт</label>
+          <select name="payout_virtual_account" id="cyc-payout-va">
+            <option value="">— не выбран —</option>
+            {% for va in virtual_accounts %}
+              <option value="{{ va.pk }}" data-beneficiary="{{ va.beneficiary_id }}"
+                {% if settings_obj.payout_virtual_account_id == va.pk %}selected{% endif %}>
+                {{ va.virtual_account_id }} ({{ va.available_balance }}₽)
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="cyc-field">
+          <label>Шаблон service_agreement</label>
+          <select name="service_agreement">
+            <option value="">— не выбран —</option>
+            {% for d in service_agreements %}
+              <option value="{{ d.pk }}" {% if settings_obj.service_agreement_id == d.pk %}selected{% endif %}>{{ d.file.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="cyc-field">
+          <label>…или загрузить новый PDF</label>
+          <input type="file" name="service_agreement_file" accept="application/pdf">
+        </div>
+        <div class="cyc-field">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" name="payout_enabled" value="1" {% if settings_obj.payout_enabled %}checked{% endif %} class="panel-checkbox__input">
+            <span class="panel-checkbox__mark"></span>
+            Автоматические выплаты включены
+          </label>
+        </div>
+        <button type="submit" class="cyc-btn">Сохранить</button>
+      </div>
+    </form>
+  </section>
+
+  {# ---------------------------- Банки СБП ---------------------------- #}
+  <section class="cyc-section" id="banks">
+    <h2>Банки СБП</h2>
+    <p class="cyc-sub">Справочник банков-участников СБП (метод list_bank_sbp). В базе: {{ sbp_bank_count }}.</p>
+    <form method="post" action="{% url 'panel:cyclops_sync_sbp_banks' %}">
+      {% csrf_token %}
+      <button type="submit" class="cyc-btn">Синхронизировать банки СБП</button>
+    </form>
+  </section>
+  {% endcomment %}
+
+  {# --------------------------- Бенефициары --------------------------- #}
+  <section class="cyc-section" id="beneficiaries">
+    <h2>Бенефициары</h2>
+    <p class="cyc-sub">Владельцы средств на номинальном счёте.</p>
+
+    <form method="post" action="{% url 'panel:cyclops_sync_beneficiaries' %}" style="margin-bottom:16px;">
+      {% csrf_token %}
+      <button type="submit" class="cyc-btn cyc-btn--ghost">Обновить из Cyclops</button>
+    </form>
+
+    <div class="cyc-table-wrap">
+      <table class="cyc-table">
+        <thead>
+          <tr>
+            <th>Наименование</th><th>Тип</th><th>ИНН</th><th>КПП</th><th>ОГРН</th>
+            <th>ID в Cyclops</th><th>Ном. счёт</th><th>Операции</th><th>В мастер-системе</th>
+            <th>Виртуальные счета</th><th>Договор оферты</th><th>Активен</th><th>Создан</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in beneficiaries %}
+            <tr {% if b.is_payer %}style="background:#fff4e0;"{% endif %}>
+              <td>
+                {% if b.is_payer %}<span class="cyc-badge cyc-badge--wait" title="Текущий плательщик призового фонда">Главный</span><br>{% endif %}
+                {{ b.name }}{% if b.first_name %}<br><small>{{ b.last_name }} {{ b.first_name }} {{ b.middle_name }}</small>{% endif %}
+              </td>
+              <td>{{ b.get_beneficiary_type_display }}</td>
+              <td>{{ b.inn }}</td>
+              <td>{{ b.kpp|default:'—' }}</td>
+              <td>{{ b.ogrn|default:'—' }}</td>
+              <td>{{ b.beneficiary_id|default:'—' }}</td>
+              <td>{{ b.nominal_account_code|default:'—' }}</td>
+              <td>
+                {% if b.permission is None %}—
+                {% elif b.permission %}<span class="cyc-badge cyc-badge--ok">разрешены</span>
+                {% else %}<span class="cyc-badge cyc-badge--no" title="{{ b.permission_description }}">запрещены</span>{% endif %}
+              </td>
+              <td>{% if b.is_added_to_ms %}<span class="cyc-badge cyc-badge--ok">да</span>{% else %}<span class="cyc-badge cyc-badge--wait">нет</span>{% endif %}</td>
+              <td>
+                <strong style="font-size:14px;">Итого: {{ b.total_balance }}₽</strong><br>
+                {% for va in b.virtual_accounts.all %}
+                  {{ va.virtual_account_id }} — {{ va.available_balance }}₽{% if va.account_type %} <small>({{ va.account_type }})</small>{% endif %}<br>
+                {% empty %}—{% endfor %}
+              </td>
+              <td>
+                {% with doc=b.contract_offer_docs.0 %}
+                  {% if doc %}
+                    <a href="{{ doc.file.url }}" target="_blank">{% if doc.uploaded %}✓ загружен{% else %}не загружен{% endif %}</a>
+                  {% else %}
+                    <span class="cyc-badge cyc-badge--no" title="Без документа Точка может отклонять идентификацию платежей и создание сделок ошибкой «Document not found»">нет документа</span>
+                  {% endif %}
+                  {% if b.beneficiary_id %}
+                    <form method="post" action="{% url 'panel:cyclops_beneficiary_upload_document' b.pk %}" enctype="multipart/form-data" style="margin-top:4px;">
+                      {% csrf_token %}
+                      <input type="file" name="document" accept="application/pdf" style="font-size:11px;max-width:140px;">
+                      <button type="submit" class="cyc-btn cyc-btn--ghost" style="padding:2px 6px;font-size:11px;">Загрузить</button>
+                    </form>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>{% if b.is_active %}<span class="cyc-badge cyc-badge--ok">да</span>{% else %}<span class="cyc-badge cyc-badge--no">нет</span>{% endif %}</td>
+              <td>{{ b.created_at|date:'d.m.Y H:i' }}</td>
+              <td>
+                {% if b.beneficiary_id %}
+                  <form method="post" action="{% url 'panel:cyclops_beneficiary_toggle_active' b.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if b.is_active %}
+                      <input type="hidden" name="active" value="0">
+                      <button type="submit" class="cyc-btn cyc-btn--ghost" style="padding:4px 10px;font-size:12px;">Деактивировать</button>
+                    {% else %}
+                      <input type="hidden" name="active" value="1">
+                      <button type="submit" class="cyc-btn" style="padding:4px 10px;font-size:12px;">Активировать</button>
+                    {% endif %}
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="14" class="cyc-empty">Бенефициаров нет. Зарегистрируйте нового или обновите из Cyclops.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% comment %}
+    <h2 style="margin-top:24px;font-size:15px;">Регистрация нового бенефициара</h2>
+    <p class="cyc-sub">Создаётся в Cyclops вместе с виртуальным счётом; договор оферты (готовый подписанный PDF)
+      загружается сразу. После отправки статус регистрации появится сообщением вверху страницы.</p>
+    <form method="post" action="{% url 'panel:cyclops_beneficiary_create' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="cyc-row">
+        <div class="cyc-field">
+          <label>Тип</label>
+          <select name="client_type" id="cyc-client-type">
+            {% for value, label in beneficiary_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="cyc-field" data-ul><label>Наименование</label><input type="text" name="name" placeholder="ООО «…»"></div>
+        <div class="cyc-field"><label>ИНН</label><input type="text" name="inn"></div>
+        <div class="cyc-field" data-ul><label>КПП</label><input type="text" name="kpp"></div>
+        <div class="cyc-field" data-ip hidden><label>Фамилия</label><input type="text" name="last_name"></div>
+        <div class="cyc-field" data-ip hidden><label>Имя</label><input type="text" name="first_name"></div>
+        <div class="cyc-field" data-ip hidden><label>Отчество</label><input type="text" name="middle_name"></div>
+        <div class="cyc-field"><label>Договор оферты (PDF)</label><input type="file" name="document" accept="application/pdf"></div>
+        <button type="submit" class="cyc-btn">Зарегистрировать</button>
+      </div>
+    </form>
+    {% endcomment %}
+  </section>
+
+  {# ---------------------------- Платежи ------------------------------ #}
+  <section class="cyc-section" id="payments">
+    <h2>Входящие платежи</h2>
+    <p class="cyc-sub">Платежи на номинальный счёт. Неидентифицированные нужно закрепить за виртуальным счётом плательщика.</p>
+
+    <form method="post" action="{% url 'panel:cyclops_sync_payments' %}" style="margin-bottom:16px;">
+      {% csrf_token %}
+      <button type="submit" class="cyc-btn cyc-btn--ghost">Обновить платежи из Cyclops</button>
+    </form>
+
+    {% if is_test_layer %}
+    <h2 style="font-size:15px;">Тестовый платёж <span class="cyc-badge cyc-badge--wait">только pre-слой</span></h2>
+    <p class="cyc-sub">Создаёт входящий платёж на номинальный счёт — для проверки идентификации и последующей выплаты.</p>
+    <form method="post" action="{% url 'panel:cyclops_test_payment' %}">
+      {% csrf_token %}
+      <div class="cyc-row">
+        <div class="cyc-field"><label>Счёт получателя (номинальный)</label><input type="text" name="recipient_account" value="{{ nominal_account }}"></div>
+        <div class="cyc-field"><label>БИК банка получателя</label><input type="text" name="recipient_bank_code" value="044525104"></div>
+        <div class="cyc-field"><label>Сумма</label><input type="number" step="0.01" name="amount" value="100.00"></div>
+        <div class="cyc-field"><label>Назначение</label><input type="text" name="purpose" value="Тестовое пополнение, без НДС"></div>
+        <button type="submit" class="cyc-btn">Отправить тестовый платёж</button>
+      </div>
+    </form>
+    <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+    {% endif %}
+
+    {% if unidentified_payments %}
+      {% if settings_obj.payout_beneficiary_id %}
+        <h2 style="font-size:15px;">Идентификация платежа</h2>
+        <p class="cyc-sub">Платёж закрепляется за счётом основного плательщика ({{ settings_obj.payout_beneficiary.name }}) на всю сумму.</p>
+        <form method="post" action="{% url 'panel:cyclops_identify_payment' %}">
+          {% csrf_token %}
+          <div class="cyc-row">
+            <div class="cyc-field">
+              <label>Неидентифицированный платёж</label>
+              <div class="panel-custom-select panel-custom-select--searchable" data-name="payment_id"
+                   data-all-label="— выберите платёж —" data-search-placeholder="Поиск по ID платежа…">
+                <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+                  <span class="panel-custom-select__value">— выберите платёж —</span>
+                  <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="panel-custom-select__panel" hidden>
+                  <ul class="panel-custom-select__list">
+                    {% for p in unidentified_payments %}
+                    <li class="panel-custom-select__item" data-value="{{ p.payment_id }}" data-label="{{ p.payment_id }} — {{ p.amount }} ₽">
+                      <span class="panel-custom-select__check"></span>{{ p.payment_id }} — {{ p.amount }} ₽
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="cyc-field">
+              <label>Виртуальный счёт плательщика</label>
+              <div class="panel-custom-select panel-custom-select--searchable" data-name="virtual_account_id"
+                   data-all-label="— выберите счёт —" data-search-placeholder="Поиск по номеру счёта…">
+                <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+                  <span class="panel-custom-select__value">— выберите счёт —</span>
+                  <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="panel-custom-select__panel" hidden>
+                  <ul class="panel-custom-select__list">
+                    {% for va in payout_accounts %}
+                    <li class="panel-custom-select__item" data-value="{{ va.virtual_account_id }}" data-label="{{ va.virtual_account_id }} ({{ va.available_balance }} ₽)">
+                      <span class="panel-custom-select__check"></span>{{ va.virtual_account_id }} ({{ va.available_balance }} ₽)
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="cyc-btn">Идентифицировать (вся сумма)</button>
+          </div>
+        </form>
+      {% else %}
+        <p class="cyc-sub" style="color:#c0392b;">Чтобы идентифицировать платежи, сначала выберите основного плательщика в разделе «Плательщик».</p>
+      {% endif %}
+    {% endif %}
+
+    <div class="cyc-table-wrap">
+      <table class="cyc-table">
+        <thead>
+          <tr><th>ID платежа</th><th class="cyc-cell--num">Сумма, ₽</th><th>Плательщик</th><th>ИНН</th><th>Назначение</th><th>Статус</th><th>Идентиф.</th><th>Дата</th></tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+            <tr>
+              <td>{{ p.payment_id }}</td>
+              <td class="cyc-cell--num">{{ p.amount }}</td>
+              <td>{{ p.payer_name|default:'—' }}</td>
+              <td>{{ p.payer_inn|default:'—' }}</td>
+              <td style="white-space:normal;max-width:280px;">{{ p.purpose|default:'—'|truncatechars:80 }}</td>
+              <td>{{ p.status }}</td>
+              <td>{% if p.identify %}<span class="cyc-badge cyc-badge--ok">да</span>{% else %}<span class="cyc-badge cyc-badge--no">нет</span>{% endif %}</td>
+              <td>{{ p.created_at|date:'d.m.Y'|default:'—' }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="cyc-empty">Платежей нет. Нажмите «Обновить платежи из Cyclops».</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {# ------------------------ Выплаты гарантированного приза ------------------------ #}
+  <section class="cyc-section" id="payouts">
+    <div class="cyc-section__head">
+      <div>
+        <h2>Выплаты гарантированного приза</h2>
+        <p class="cyc-sub" style="margin-bottom:0;">
+          По 50 ₽ каждому участнику, выполнившему условия. Выплаты уходят партией раз в неделю
+          (пятница); отдельную выплату можно отправить кнопкой «Оплатить» в строке таблицы —
+          она выполняется сразу, результат виден в этой же строке. Двойная выплата исключена:
+          на участника физически может существовать только одна запись выплаты, а сама отправка
+          блокирует запись на время исполнения.
+        </p>
+      </div>
+      <a href="{% url 'panel:cyclops_payouts_export' %}{% if payout_export_query %}?{{ payout_export_query }}{% endif %}"
+         class="cyc-btn cyc-btn--ghost cyc-btn--icon">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Скачать Excel
+      </a>
+    </div>
+
+    {% comment %}Верхнеуровневая картина: сколько денег уже ушло, сколько ещё в работе
+    и сколько выплат встало так, что без человека не поедет дальше.{% endcomment %}
+    <div class="cyc-kpis">
+      <div class="cyc-kpi">
+        <span class="cyc-kpi__label">Всего выплат</span>
+        <span class="cyc-kpi__value">{{ payout_stats.total_count }}</span>
+        <span class="cyc-kpi__sub">{{ payout_stats.total_amount }} ₽</span>
+      </div>
+      <div class="cyc-kpi cyc-kpi--ok">
+        <span class="cyc-kpi__label">Выплачено</span>
+        <span class="cyc-kpi__value">{{ payout_stats.paid_count }}</span>
+        <span class="cyc-kpi__sub">{{ payout_stats.paid_amount }} ₽ · деньги у участников</span>
+      </div>
+      <div class="cyc-kpi cyc-kpi--wait">
+        <span class="cyc-kpi__label">В работе</span>
+        <span class="cyc-kpi__value">{{ payout_stats.open_count }}</span>
+        <span class="cyc-kpi__sub">{{ payout_stats.open_amount }} ₽ · уйдут сами</span>
+      </div>
+      <div class="cyc-kpi {% if payout_stats.action_count %}cyc-kpi--no{% endif %}">
+        <span class="cyc-kpi__label">Требуют проверки</span>
+        <span class="cyc-kpi__value">{{ payout_stats.action_count }}</span>
+        <span class="cyc-kpi__sub">{{ payout_stats.action_amount }} ₽ · нужен человек</span>
+      </div>
+      <div class="cyc-kpi">
+        <span class="cyc-kpi__label">Отказались от приза</span>
+        <span class="cyc-kpi__value">{{ payout_stats.opted_out_count }}</span>
+        <span class="cyc-kpi__sub">выплата отключена в карточке</span>
+      </div>
+    </div>
+
+    {% comment %}Разбивка по состояниям — она же фильтр: клик по плашке оставляет
+    в таблице только этот этап, сохраняя остальные фильтры раздела.{% endcomment %}
+    <div class="cyc-stages">
+      {% for item in payout_stats.stage_breakdown %}
+        <a href="?{{ item.link }}" title="{{ item.hint }}"
+           class="cyc-stage cyc-stage--{{ item.tone }}{% if item.is_selected %} is-selected{% endif %}">
+          <span class="cyc-stage__label">{{ item.label }}</span>
+          <span class="cyc-stage__count">{{ item.count }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <details class="cyc-legend">
+      <summary>Что означает каждое состояние выплаты</summary>
+      <dl>
+        {% for item in payout_stages %}
+          <dt><span class="cyc-badge cyc-badge--{{ item.tone }}">{{ item.label }}</span></dt>
+          <dd>{{ item.hint }}</dd>
+        {% endfor %}
+      </dl>
+      <p>
+        Состояния собраны из технических статусов движка выплат: один и тот же статус
+        «в очереди» означает и «ещё ни разу не отправляли», и «банк отклонил, повторим
+        в пятницу» — здесь они разведены, чтобы картина читалась без чтения кода.
+      </p>
+    </details>
+
+    <form method="get" action="{% url 'panel:cyclops' %}#payouts" class="cyc-filters">
+      {% comment %}Сортировку и размер страницы фильтр не сбрасывает — иначе каждое
+      применение фильтра возвращало бы таблицу к виду по умолчанию.{% endcomment %}
+      {% if selected_sort %}<input type="hidden" name="sort" value="{{ selected_sort }}">{% endif %}
+      {% if selected_direction %}<input type="hidden" name="direction" value="{{ selected_direction }}">{% endif %}
+      {% if per_page %}<input type="hidden" name="per_page" value="{{ per_page }}">{% endif %}
+
+      <div class="cyc-row">
+        <div class="cyc-field cyc-field--wide">
+          <label for="cyc-payout-q">Поиск участника</label>
+          <input type="text" id="cyc-payout-q" name="payout_q" value="{{ payout_filters.q }}"
+                 placeholder="email, ФИО, телефон в любом формате или ID сделки" autocomplete="off">
+        </div>
+        <div class="cyc-field">
+          <label>Реестр выплат</label>
+          <div class="panel-custom-select panel-custom-select--searchable" data-name="payout_registry"
+               data-all-label="— все —" data-search-placeholder="Поиск реестра…">
+            <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+              <span class="panel-custom-select__value">— все —</span>
+              <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="panel-custom-select__panel" hidden>
+              <ul class="panel-custom-select__list">
+                <li class="panel-custom-select__item{% if not payout_filters.registry %} is-selected{% endif %}" data-value="" data-label="— все —">
+                  <span class="panel-custom-select__check"></span>— все —
+                </li>
+                {% for r in payout_registries %}
+                <li class="panel-custom-select__item{% if payout_filters.registry == r.pk|stringformat:'s' %} is-selected{% endif %}" data-value="{{ r.pk }}" data-label="{{ r }}">
+                  <span class="panel-custom-select__check"></span>{{ r }}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="cyc-field">
+          <label>Создана с</label>
+          <input type="date" name="payout_created_from" value="{{ payout_filters.created_from }}">
+        </div>
+        <div class="cyc-field">
+          <label>по</label>
+          <input type="date" name="payout_created_to" value="{{ payout_filters.created_to }}">
+        </div>
+        <div class="cyc-field">
+          <label>Выплачена с</label>
+          <input type="date" name="payout_paid_from" value="{{ payout_filters.paid_from }}">
+        </div>
+        <div class="cyc-field">
+          <label>по</label>
+          <input type="date" name="payout_paid_to" value="{{ payout_filters.paid_to }}">
+        </div>
+      </div>
+
+      <div class="cyc-field cyc-field--full">
+        <label>Состояние выплаты</label>
+        <div class="cyc-checks">
+          {% for item in payout_stages %}
+            <label class="cyc-check" title="{{ item.hint }}">
+              <input type="checkbox" name="payout_stage" value="{{ item.value }}"
+                     {% if item.value in payout_filters.stages %}checked{% endif %}>
+              <span>{{ item.label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="cyc-row">
+        <button type="submit" class="cyc-btn">Применить</button>
+        {% if payout_filters.is_active %}
+          <a href="{% url 'panel:cyclops' %}#payouts" class="cyc-btn cyc-btn--ghost">Сбросить фильтры</a>
+        {% endif %}
+        <span class="cyc-sub" style="margin:0;">
+          Выплат в выборке: <strong>{{ payout_stats.selected_count }}</strong>
+          · на сумму <strong>{{ payout_stats.selected_amount }} ₽</strong>
+        </span>
+      </div>
+    </form>
+
+    <div class="cyc-table-wrap">
+      <table class="cyc-table">
+        <thead>
+          <tr>
+            <th>Участник</th>
+            <th>Телефон</th>
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.amount label='Сумма, ₽' align='right' %}
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.stage label='Состояние' %}
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.cnt_retry label='Попыток' align='right' %}
+            <th>Причина ошибки</th>
+            <th>Сделка и документы</th>
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.created_at label='Создана' %}
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.paid_at label='Выплачена' %}
+            {% include 'panel/cyclops_sort_th.html' with col=sort_context.updated_at label='Обновлена' %}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payouts %}
+            <tr>
+              <td>
+                {% comment %}Карточка участника — та же модалка, что и в разделе «Участники»;
+                return_to возвращает сюда же после сохранения.{% endcomment %}
+                <button type="button" class="cyc-link panel-open-modal-btn"
+                        data-url="{% url 'panel:participant_detail' p.participant_id %}?return_to={{ request.get_full_path|urlencode }}%23payouts">
+                  {{ p.participant.email }}
+                </button>
+                <div class="cyc-cell-sub">
+                  {{ p.participant.last_name }} {{ p.participant.first_name }} {{ p.participant.middle_name|default:'' }}
+                </div>
+                {% if p.participant.guaranteed_prize_opt_out %}
+                  <span class="cyc-badge cyc-badge--mute" title="В карточке участника стоит галочка «Отказ от гарантированного приза»">отказ от приза</span>
+                {% endif %}
+              </td>
+              <td>{{ p.phone_number|default:p.participant.phone|default:'—' }}</td>
+              <td class="cyc-cell--num">{{ p.amount }}</td>
+              <td>
+                {% if p.stage_meta %}
+                  <span class="cyc-badge cyc-badge--{{ p.stage_meta.tone }}" title="{{ p.stage_meta.hint }}">{{ p.stage_meta.label }}</span>
+                {% else %}
+                  <span class="cyc-badge cyc-badge--mute">{{ p.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td class="cyc-cell--num">{{ p.cnt_retry }}</td>
+              <td style="white-space:normal;max-width:240px;">{{ p.error_reason|default:'—'|truncatechars:120 }}</td>
+              <td>
+                {{ p.deal_id|default:'—' }}
+                {% if p.registry or p.document %}
+                  <div class="cyc-cell-sub">
+                    {% if p.registry %}<a href="{{ p.registry.file.url }}" target="_blank">реестр №{{ p.registry.registry_number }}</a>{% endif %}
+                    {% if p.document %}{% if p.registry %} · {% endif %}<a href="{{ p.document.file.url }}" target="_blank">документ {{ p.document.document_number }}</a>{% endif %}
+                  </div>
+                {% endif %}
+              </td>
+              <td>{{ p.created_at|date:'d.m.Y H:i' }}</td>
+              <td>{{ p.paid_at|date:'d.m.Y H:i'|default:'—' }}</td>
+              <td>{{ p.updated_at|date:'d.m.Y H:i' }}</td>
+              <td>
+                {% if p.participant.guaranteed_prize_opt_out %}
+                  <span class="cyc-sub" style="margin:0;" title="Снимите галочку «Отказ от гарантированного приза» в карточке участника">отключена</span>
+                {% elif p.status != 'paid' and p.status != 'processing' and p.status != 'executing' %}
+                  <form method="post" action="{% url 'panel:cyclops_payout_trigger' p.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="cyc-btn" style="padding:4px 10px;font-size:12px;">
+                      {% if p.cnt_retry %}Повторить{% else %}Оплатить{% endif %}
+                    </button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="11" class="cyc-empty">
+              {% if payout_filters.is_active %}По выбранным фильтрам выплат нет — измените условия или сбросьте фильтры.{% else %}Выплат пока нет.{% endif %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'panel/pagination.html' with page_obj=payouts %}
+  </section>
+</div>
+
+<script>
+  (function () {
+    // ---- Поисковый выпадающий список (обёртка над нативным <select>) ----
+    function enhanceSearchable(select) {
+      if (select.dataset.ssReady) return;
+      select.dataset.ssReady = '1';
+      select.style.display = 'none';
+
+      var wrap = document.createElement('div'); wrap.className = 'cyc-ss';
+      var input = document.createElement('input');
+      input.type = 'text'; input.className = 'cyc-ss__input'; input.autocomplete = 'off';
+      var panel = document.createElement('div'); panel.className = 'cyc-ss__panel'; panel.hidden = true;
+      wrap.appendChild(input); wrap.appendChild(panel);
+      select.parentNode.insertBefore(wrap, select.nextSibling);
+
+      function label() { var o = select.options[select.selectedIndex]; return o ? o.text.trim() : ''; }
+      function render(filter) {
+        panel.innerHTML = '';
+        var f = (filter || '').toLowerCase();
+        Array.prototype.forEach.call(select.options, function (opt) {
+          if (opt.hidden || opt.disabled) return;
+          var text = opt.text.trim();
+          if (f && text.toLowerCase().indexOf(f) === -1) return;
+          var item = document.createElement('div');
+          item.className = 'cyc-ss__item' + (opt.value === select.value ? ' is-sel' : '');
+          item.textContent = text;
+          item.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            select.value = opt.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            close();
+          });
+          panel.appendChild(item);
+        });
+        if (!panel.children.length) {
+          var em = document.createElement('div'); em.className = 'cyc-ss__empty'; em.textContent = 'Нет совпадений';
+          panel.appendChild(em);
+        }
+      }
+      function open() { panel.hidden = false; input.value = ''; input.placeholder = label() || 'Поиск…'; render(''); }
+      function close() { panel.hidden = true; input.value = label(); }
+      input.addEventListener('focus', open);
+      input.addEventListener('input', function () { render(input.value); });
+      document.addEventListener('mousedown', function (e) { if (!wrap.contains(e.target)) close(); });
+      select.addEventListener('change', function () { close(); });
+      input.value = label();
+    }
+    document.querySelectorAll('.cyc-section select').forEach(enhanceSearchable);
+
+    // ---- Регистрация: переключение полей ЮЛ/ИП ----
+    var typeSel = document.getElementById('cyc-client-type');
+    if (typeSel) {
+      var toggleType = function () {
+        var isIp = typeSel.value === 'ip';
+        document.querySelectorAll('[data-ip]').forEach(function (el) { el.hidden = !isIp; });
+        document.querySelectorAll('[data-ul]').forEach(function (el) { el.hidden = isIp; });
+      };
+      typeSel.addEventListener('change', toggleType);
+      toggleType();
+    }
+
+    // ---- Настройки: зависимый список вирт.счетов от выбранного бенефициара ----
+    var benSel = document.getElementById('cyc-payout-beneficiary');
+    var vaSel = document.getElementById('cyc-payout-va');
+    if (benSel && vaSel) {
+      var allOptions = Array.prototype.slice.call(vaSel.querySelectorAll('option[data-beneficiary]'));
+      var filterVa = function (keepValue) {
+        var benId = benSel.value;
+        var firstVisible = null;
+        allOptions.forEach(function (opt) {
+          var match = opt.getAttribute('data-beneficiary') === benId;
+          opt.hidden = !match;
+          opt.disabled = !match;
+          if (match && firstVisible === null) firstVisible = opt;
+        });
+        var cur = vaSel.options[vaSel.selectedIndex];
+        if (!keepValue || !cur || cur.hidden) {
+          vaSel.value = firstVisible ? firstVisible.value : '';
+        }
+        // синхронизировать поисковую обёртку счёта
+        vaSel.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      benSel.addEventListener('change', function () { filterVa(false); });
+      filterVa(true);
+    }
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% load panel_extras %}
+<div class="panel-modal__header">
+  <div class="panel-modal__header-row">
+    <div class="panel-modal__identity">
+      <h2 class="panel-modal__title">Заменить победителя</h2>
+      <span class="panel-muted">
+        {{ row.participant|display_name:is_masked_user }} · {{ row.prize.name|default:"без приза" }} · {{ row.period_label }}
+      </span>
+    </div>
+    <button class="panel-modal__close" id="panel-modal-close" type="button" title="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="panel-modal__body">
+  {% if not can_replace %}
+  <div class="panel-modal__section">
+    <p class="panel-wr-alert panel-wr-alert--error">{{ block_reason }}</p>
+  </div>
+  {% else %}
+
+  <div class="panel-modal__section">
+    <p class="panel-wr-alert">
+      Замена не меняет опубликованные итоги на лендинге: в блоке «Победители» на сайте
+      навсегда остаётся тот, кто был объявлен победителем изначально.
+    </p>
+    {% if row.contract_link or row.status_oki_document %}
+    <p class="panel-wr-alert">
+      У прежнего победителя уже выставлен договор в OkiDoki — при замене он будет
+      автоматически аннулирован (или расторгнут, если уже подписан не был), и по этому же
+      призовому слоту можно будет обычным порядком выставить новый договор новому победителю.
+    </p>
+    {% endif %}
+    <div class="panel-wr-conditions">
+      <div class="panel-wr-conditions__title">Условия розыгрыша — {{ conditions.label }}</div>
+      <ul class="panel-wr-conditions__list">
+        {% for rule in conditions.rules %}<li>{{ rule }}</li>{% endfor %}
+      </ul>
+      <p class="panel-wr-conditions__count">
+        Подходящих участников: <strong>{{ eligible_count }}</strong>
+      </p>
+    </div>
+  </div>
+
+  <form method="post" action="{{ form_action }}" data-winner-replace-form
+        data-candidates-url="{{ candidates_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="mode" value="auto" data-wr-mode>
+    <input type="hidden" name="participant_id" value="" data-wr-participant>
+    <input type="hidden" name="receipt_id" value="" data-wr-receipt>
+
+    <div class="panel-modal__section">
+      <div class="panel-modal__section-title">Как выбрать нового победителя</div>
+      <div class="panel-wr-modes">
+        <button type="button" class="panel-wr-mode is-active" data-wr-mode-btn="auto">
+          <span class="panel-wr-mode__title">Автоматически</span>
+          <span class="panel-wr-mode__hint">
+            Система сама выберет участника, подходящего под те же условия. Сначала берутся
+            резервные победители этого розыгрыша, затем — случайный из подходящих.
+          </span>
+        </button>
+        <button type="button" class="panel-wr-mode" data-wr-mode-btn="manual">
+          <span class="panel-wr-mode__title">Выбрать самостоятельно</span>
+          <span class="panel-wr-mode__hint">
+            В списке сначала идут подходящие под условия участники, затем — все остальные.
+            Победителем можно назначить любого участника.
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="panel-modal__section" data-wr-pane="auto">
+      {% if eligible_count %}
+      <div class="panel-modal__section-title">Кто может стать победителем</div>
+      <ul class="panel-wr-preview">
+        {% for option in eligible_preview %}
+        <li>
+          <span class="panel-wr-preview__name">{{ option.label }}</span>
+          {% if option.reserve_rank %}<span class="panel-wr-tag panel-wr-tag--reserve">резерв №{{ option.reserve_rank }}</span>{% endif %}
+          <span class="panel-wr-preview__note">{{ option.note }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if eligible_count > 5 %}
+      <p class="panel-muted">…и ещё {{ eligible_count|add:"-5" }}. Конкретный победитель выбирается случайно среди подходящих.</p>
+      {% endif %}
+      {% else %}
+      <p class="panel-wr-alert panel-wr-alert--error">
+        Нет ни одного участника, подходящего под условия этого розыгрыша.
+        Выберите нового победителя вручную.
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="panel-modal__section" data-wr-pane="manual" hidden>
+      <div class="panel-modal__section-title">Новый победитель</div>
+      <div class="panel-wr-select" data-wr-select>
+        <button type="button" class="panel-wr-select__trigger" aria-expanded="false">
+          <span class="panel-wr-select__value panel-wr-select__value--empty">— выбрать участника —</span>
+          <svg class="panel-wr-select__chevron" width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="panel-wr-select__panel" hidden>
+          <input type="text" class="panel-wr-select__input" placeholder="Поиск: ФИО, email, телефон…" autocomplete="off">
+          <div class="panel-wr-select__list"></div>
+        </div>
+      </div>
+      <p class="panel-field__hint" data-wr-chosen-hint hidden></p>
+    </div>
+
+    <div class="panel-modal__section">
+      <div class="panel-modal__section-title">Причина замены</div>
+      <textarea class="panel-field__input" name="reason" rows="3"
+                placeholder="Например: победитель не выходит на связь с 12.09"></textarea>
+      <p class="panel-wr-error" data-wr-error hidden></p>
+      <div class="panel-form-actions">
+        <button type="submit" class="panel-btn" data-wr-submit>Заменить победителя</button>
+      </div>
+    </div>
+  </form>
+  {% endif %}
+
+  {% if history %}
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">История замен</div>
+    {% include "panel/winner_replacement_history.html" with history=history %}
+  </div>
+  {% endif %}
+</div>

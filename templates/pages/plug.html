@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<section class="section section--plug">
+    <div class="container plug">
+        <div class="plug__brand">{{ company_info.brand_name }}</div>
+        <h1 class="plug__title">{{ company_info.promotion_name }}</h1>
+        <p class="plug__subtitle">Скоро старт</p>
+
+        {% if promotion_start_iso %}
+        <div class="countdown" data-countdown="{{ promotion_start_iso }}">
+            <div class="countdown__values">
+                <div class="countdown__cell"><span data-countdown-days>00</span><small>дней</small></div>
+                <div class="countdown__cell"><span data-countdown-hours>00</span><small>часов</small></div>
+                <div class="countdown__cell"><span data-countdown-minutes>00</span><small>минут</small></div>
+                <div class="countdown__cell"><span data-countdown-seconds>00</span><small>секунд</small></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <p class="plug__support">Вопросы: <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
+    </div>
+</section>
+{% endblock %}

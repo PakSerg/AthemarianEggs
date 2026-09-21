@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>{{ title }}</h1>
+  <p>{% translate "Скачайте Excel-отчёты — те же файлы, что отправляются в Telegram-боте." %}</p>
+  <p>
+    <a href="{% url 'admin:promotion_analyticsdashboard_statistics' %}" class="button">Скачать статистику</a>
+  </p>
+
+  <h2>Причины отклонения чеков</h2>
+  {% if rejection_reasons %}
+  <table>
+    <thead>
+      <tr><th>Причина</th><th>Чеков</th><th>% от отклонённых</th></tr>
+    </thead>
+    <tbody>
+      {% for reason in rejection_reasons %}
+      <tr><td>{{ reason.label }}</td><td>{{ reason.count }}</td><td>{{ reason.percent }}%</td></tr>
+      {% endfor %}
+      <tr><th>Итого отклонено</th><th>{{ rejected_total }}</th><th>100%</th></tr>
+    </tbody>
+  </table>
+  {% else %}
+  <p>Отклонённых чеков пока нет.</p>
+  {% endif %}
+</div>
+{% endblock %}

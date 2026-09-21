@@ -1,0 +1,5 @@
+{% comment %}
+Подтверждение прав в Яндекс Вебмастере. Код приезжает из настроек
+(YANDEX_VERIFICATION в .env) — пока он пустой, мета-тега нет.
+{% endcomment %}
+{% if YANDEX_VERIFICATION %}<meta name="yandex-verification" content="{{ YANDEX_VERIFICATION }}" />{% endif %}

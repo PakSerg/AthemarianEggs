@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block email_title %}{{ site_name }}{% endblock %}</title>
+    <style>
+
+
+
+
+        body, table, td, a {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            margin:0;
+            padding:0;
+            background-color:#030D34;
+            font-family:Arial,Helvetica,sans-serif;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        .table-1{
+            max-width:600px;
+            background-color:#030D34;
+            padding: 48px 32px;
+        }
+
+        @media screen and (max-width: 480px) {
+            .table-1{ padding: 36px 20px; }
+        }
+    </style>
+</head>
+<body>
+{% block preheader %}{% endblock %}
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#030D34;">
+    <tr>
+        <td align="center">
+            <table class="table-1" role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td style="text-align:center;">
+                        <a href="{{ site_url }}" style="text-decoration:none;display:inline-block;margin-bottom:40px;">
+                            <img src="{{ email_logo_url }}" width="150" height="128" alt="{{ site_name }}" style="display:block;border:0;margin:0 auto;max-width:150px;height:auto;">
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {% block email_content %}{% endblock %}
+                    </td>
+                </tr>
+                <tr class="footer-table">
+                    <td>
+                        {% block footer %}
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tr>
+                                <td style="padding:8px 12px 0 12px;text-align:center;">
+                                    <p style="margin:0;font-family:Arial,sans-serif;font-size:18px;line-height:1.5;font-weight:350;color:#8B93AD;">
+                                        Вопросы по акции направляйте по адресу:
+                                        <a href="mailto:{{ support_email }}" style="text-decoration:underline;color:#8B93AD;font-family:Arial,sans-serif;">{{ support_email }}</a>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                        {% endblock %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

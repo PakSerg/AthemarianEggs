@@ -1,0 +1,19 @@
+{% with block=blocks.faq %}
+{% if block %}
+<section class="section" id="faq">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Вопросы и ответы" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        <div class="faq" data-accordion>
+            <div class="faq__column">
+                {% for item in faq_left %}{% include 'partials/sections/faq_item.html' with item=item %}{% endfor %}
+            </div>
+            <div class="faq__column">
+                {% for item in faq_right %}{% include 'partials/sections/faq_item.html' with item=item %}{% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endwith %}

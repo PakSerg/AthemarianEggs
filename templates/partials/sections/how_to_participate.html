@@ -1,0 +1,23 @@
+{% with block=blocks.how_to_participate %}
+{% if block %}
+<section class="section" id="how-to-participate">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Как участвовать" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        <ol class="steps">
+            {% for step in steps %}
+            <li class="steps__item">
+                <div class="steps__number">{{ step.number }}</div>
+                {% if step.icon %}<img class="steps__icon" src="{{ step.icon.url }}" alt="" loading="lazy">{% endif %}
+                <h3 class="steps__title">{{ step.title }}</h3>
+                {% if step.text %}<p class="steps__text">{{ step.text }}</p>{% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+
+        {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

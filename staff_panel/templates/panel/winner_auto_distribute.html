@@ -1,0 +1,100 @@
+{% load panel_extras %}
+<div class="panel-modal__header">
+  <div class="panel-modal__header-row">
+    <div class="panel-modal__identity">
+      <h2 class="panel-modal__title">Автоматическое распределение призов</h2>
+      {% if preview %}
+      <span class="panel-muted">{{ preview.kind_label }} · {{ preview.period_label }}</span>
+      {% endif %}
+    </div>
+    <button class="panel-modal__close" id="panel-modal-close" type="button" title="Закрыть">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="panel-modal__body">
+  {% if error %}
+  <div class="panel-modal__section">
+    <p class="panel-wr-error">{{ error }}</p>
+  </div>
+  {% endif %}
+
+  <div class="panel-modal__section">
+    <div class="panel-modal__section-title">Розыгрыш</div>
+    {% if draws %}
+    <div class="panel-custom-select" id="panel-ad-draw-select" data-name="draw"
+         data-base-url="{% url 'panel:winner_auto_distribute' %}"
+         title="Файлы раздаются только победителям одного выбранного здесь розыгрыша">
+      <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+        <span class="panel-custom-select__value">{% for draw in draws %}{% if draw.value == selected_value %}{{ draw.label }}{% endif %}{% endfor %}</span>
+        <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="panel-custom-select__panel" hidden>
+        <ul class="panel-custom-select__list">
+          {% for draw in draws %}
+          <li class="panel-custom-select__item{% if draw.value == selected_value %} is-selected{% endif %}" data-value="{{ draw.value }}" data-label="{{ draw.label }}">
+            <span class="panel-custom-select__check"></span>{{ draw.label }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% else %}
+    <p class="panel-wr-alert panel-wr-alert--error">Розыгрыши ещё не проводились — раздавать пока нечего.</p>
+    {% endif %}
+  </div>
+
+  {% if preview %}
+  <div class="panel-modal__section">
+    <p class="panel-wr-alert" title="Файл подбирается автоматически только под тот же приз и тот же тип розыгрыша, что и у победителя">
+      Раздаются свободные файлы под призы победителей этого розыгрыша. Склад приза общий на все
+      недели — неважно, когда именно файлы загрузили, — но партии соседнего типа розыгрыша
+      (например, ежемесячные) не трогаются. Победители с уже выданным файлом или с неэлектронным
+      призом пропускаются автоматически — их трогать не нужно.
+    </p>
+
+    <dl class="panel-modal__dl">
+      <dt>Победителей в розыгрыше</dt><dd>{{ preview.total_in_scope }}</dd>
+      <dt>Уже с файлом</dt><dd>{{ preview.already_assigned }}</dd>
+      <dt>Приз не электронный</dt><dd>{{ preview.non_electronic }}</dd>
+      <dt>Будет выдано сейчас</dt><dd><strong>{{ preview.matched|length }}</strong></dd>
+      <dt>Нет свободного файла</dt><dd>{{ preview.unmatched|length }}</dd>
+    </dl>
+
+    {% if preview.unmatched %}
+    <div class="panel-wr-alert panel-wr-alert--error">
+      Не хватает свободных файлов для {{ preview.unmatched|length }}:
+      <ul class="panel-wr-conditions__list">
+        {% for row in preview.unmatched %}
+        <li>{{ row.fio }} — {{ row.prize.name|default:"—" }}</li>
+        {% endfor %}
+      </ul>
+      Загрузите недостающие файлы на странице
+      <a href="{% url 'panel:prize_files' %}" target="_blank">«Файлы призов»</a> и повторите —
+      либо выдайте им файл вручную в колонке «Файл приза» после загрузки.
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="panel-modal__section">
+    {% if preview.matched %}
+    <form method="post" action="{% url 'panel:winner_auto_distribute' %}" data-panel-ajax-form>
+      {% csrf_token %}
+      <input type="hidden" name="kind" value="{{ selected_kind }}">
+      <input type="hidden" name="period" value="{{ selected_period_raw }}">
+      <div class="panel-form-actions">
+        <button type="submit" class="panel-btn"
+                title="Файл выдаётся только победителям без файла, у которых нашёлся свободный файл под их приз и этот тип розыгрыша">
+          {% if preview.unmatched %}Распределить {{ preview.matched|length }}, пропустив {{ preview.unmatched|length }}{% else %}Распределить {{ preview.matched|length }}{% endif %}
+        </button>
+      </div>
+    </form>
+    {% elif preview.unmatched %}
+    <p class="panel-muted">Раздавать сейчас нечего — подходящих свободных файлов не нашлось (см. список выше).</p>
+    {% else %}
+    <p class="panel-muted">Раздавать нечего — у всех подходящих победителей этого розыгрыша уже есть файл.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

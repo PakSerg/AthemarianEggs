@@ -1,0 +1,20 @@
+{% with block=blocks.products %}
+{% if block %}
+<section class="section" id="products">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Товары акции" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        {% if desktop_products %}
+        <ul class="product-grid">
+            {% for product in desktop_products %}{% include 'partials/sections/product_card.html' with product=product %}{% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="section__actions">
+            <a class="button button--ghost" href="{% url 'main:products' %}">Все товары акции</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endwith %}

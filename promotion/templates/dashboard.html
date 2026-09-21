@@ -1,0 +1,472 @@
+{% extends 'base_promotion.html' %}
+{% load static %}
+
+{% block title %}{{ company_info.brand_name }} | Личный кабинет участника{% endblock %}
+{% block description %}
+    <meta name="description" content="Ваши чеки, призы и статус участия в акции. Следите за выигрышами в личном кабинете.">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/participants/dashboard.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container section section-first">
+    <div class="zag-section">ЛИЧНЫЙ КАБИНЕТ</div>
+</div>
+
+<div class="container section">
+    <div class="card-mini-info-user">
+        <div class="head-card-mini-info-user">
+            <div class="user-card-mini-info-user">
+                <div class="email-card-mini-info-user" title="{{ request.user.email }}">{{ request.user.email }}</div>
+                <div class="id-card-mini-info-user">ID {{ request.user.public_id }}</div>
+            </div>
+            <a href="{% url 'participants:profile' %}" class="btn-change-profile-card-mini-info-user">
+                <svg style="margin-top: -3px;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M2.25 15.75H9H15.75" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9.16635 4.37132L12.8787 8.0836M9.16635 4.37132L11.2877 2.25L15 5.96231L12.8787 8.0836L9.16635 4.37132ZM9.16635 4.37132L4.96141 8.57628C4.82077 8.7169 4.74175 8.9077 4.74175 9.1066V12.5082H8.14342C8.34232 12.5082 8.53305 12.4293 8.67375 12.2886L12.8787 8.0836L9.16635 4.37132Z" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Изменить данные
+            </a>
+        </div>
+
+        <div class="info-counts-obj-action">
+            <div class="d-flex gap-row-cards-obj-counts-action">
+                <div class="card-count-prizes">
+                    <div class="count-prizes">Чеков внесено: <span>{{ checks_total }} шт.</span></div>
+                </div>
+                <div class="card-count-prizes">
+                    <div class="count-prizes">Призов выиграно: <span>{{ win_prizes_total }} шт.</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="container section">
+    <div class="card-history-checks">
+        <div class="d-flex align-items-center justify-content-between mb-5 flex-wrap" style="row-gap: 12px;">
+            <div class="zag-card-history-checks">ИСТОРИЯ ЧЕКОВ</div>
+            <div class="card-stats-card-history-checks">
+
+                Чеков внесено: <span>{{ checks_total }} шт.</span>
+            </div>
+        </div>
+        <div id="checks-table-container">
+        {% if checks %}
+        <div style="overflow-x: auto; max-width: 100%;" class="table-history-checks-wrapper">
+        <table class="table-history-checks">
+            <tr class="header-table-history-checks">
+                <th class="left-radius-th">
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        Дата покупки
+                        <a href="?{{ sort_links.date }}">
+                            {% if selected_sort == 'date' and selected_direction == 'desc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 13.3327L10.6665 11.3327M12.6665 6.66602V13.3327V6.66602ZM12.6665 13.3327L14.6665 11.3327L12.6665 13.3327Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% elif selected_sort == 'date' and selected_direction == 'asc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 2.66602L10.6665 4.66602M12.6665 9.33268V2.66602V9.33268ZM12.6665 2.66602L14.6665 4.66602L12.6665 2.66602Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M6.66732 9.33325H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5.33398 6.66675H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00065 4H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.00065 12H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.666 2.66675L10.666 4.66675M12.666 13.3334V2.66675V13.3334ZM12.666 13.3334L14.666 11.3334L12.666 13.3334ZM12.666 13.3334L10.666 11.3334L12.666 13.3334ZM12.666 2.66675L14.666 4.66675L12.666 2.66675Z" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        Статус
+                        <a href="?{{ sort_links.status }}">
+                            {% if selected_sort == 'status' and selected_direction == 'desc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 13.3327L10.6665 11.3327M12.6665 6.66602V13.3327V6.66602ZM12.6665 13.3327L14.6665 11.3327L12.6665 13.3327Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% elif selected_sort == 'status' and selected_direction == 'asc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 2.66602L10.6665 4.66602M12.6665 9.33268V2.66602V9.33268ZM12.6665 2.66602L14.6665 4.66602L12.6665 2.66602Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M6.66732 9.33325H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5.33398 6.66675H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00065 4H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.00065 12H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.666 2.66675L10.666 4.66675M12.666 13.3334V2.66675V13.3334ZM12.666 13.3334L14.666 11.3334L12.666 13.3334ZM12.666 13.3334L10.666 11.3334L12.666 13.3334ZM12.666 2.66675L14.666 4.66675L12.666 2.66675Z" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        Сумма чека
+                        <a href="?{{ sort_links.amount }}">
+                            {% if selected_sort == 'amount' and selected_direction == 'desc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 13.3327L10.6665 11.3327M12.6665 6.66602V13.3327V6.66602ZM12.6665 13.3327L14.6665 11.3327L12.6665 13.3327Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% elif selected_sort == 'amount' and selected_direction == 'asc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 2.66602L10.6665 4.66602M12.6665 9.33268V2.66602V9.33268ZM12.6665 2.66602L14.6665 4.66602L12.6665 2.66602Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M6.66732 9.33325H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5.33398 6.66675H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00065 4H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.00065 12H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.666 2.66675L10.666 4.66675M12.666 13.3334V2.66675V13.3334ZM12.666 13.3334L14.666 11.3334L12.666 13.3334ZM12.666 13.3334L10.666 11.3334L12.666 13.3334ZM12.666 2.66675L14.666 4.66675L12.666 2.66675Z" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        Дата регистрации
+                        <a href="?{{ sort_links.date_registration }}">
+                            {% if selected_sort == 'date_registration' and selected_direction == 'desc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 13.3327L10.6665 11.3327M12.6665 6.66602V13.3327V6.66602ZM12.6665 13.3327L14.6665 11.3327L12.6665 13.3327Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% elif selected_sort == 'date_registration' and selected_direction == 'asc' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M9.3335 9.33398H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.66683 6.66602H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00016 4H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.0002 12H1.3335" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.6665 2.66602L10.6665 4.66602M12.6665 9.33268V2.66602V9.33268ZM12.6665 2.66602L14.6665 4.66602L12.6665 2.66602Z" stroke="var(--color-red)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="svg-icon-sort">
+                            <path d="M6.66732 9.33325H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5.33398 6.66675H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.00065 4H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8.00065 12H1.33398" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.666 2.66675L10.666 4.66675M12.666 13.3334V2.66675V13.3334ZM12.666 13.3334L14.666 11.3334L12.666 13.3334ZM12.666 13.3334L10.666 11.3334L12.666 13.3334ZM12.666 2.66675L14.666 4.66675L12.666 2.66675Z" stroke="var(--color-black)" stroke-width="1.2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% endif %}
+                        </a>
+                    </div>
+                </th>
+                <th class="right-radius-th">Информация</th>
+            </tr>
+
+            {% for check in checks %}
+            <tr class="body-table-history-checks">
+                <td class="d-flex align-items-center" style="gap: 10px">
+                    {% if check.receipt_image %}
+                    <img src="{% static 'img/participants/cbda8118c150756871dc6340cbd671564c7bf600.png' %}" class="img-qr-check" data-bs-toggle="modal" data-bs-target="#watchCheckModal" data-check-image="{{ check.receipt_image.url }}">
+                    {% else %}
+                    <img src="{% static 'img/participants/cbda8118c150756871dc6340cbd671564c7bf600.png' %}" class="img-qr-check">
+                    {% endif %}
+                    <div class="value-table-history-checks">
+                        {% if check.date %}{{ check.date|date:"H:i d.m.Y" }}{% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="status-table-history-checks {% if check.status == 'confirmed' %}success{% elif check.status == 'rejected' %}danger{% elif check.status == 'winner' %}winner{% else %}warning{% endif %}">
+                        {% if check.status == 'confirmed' %}
+                            <img style="margin-top: -3px;" src="{% static 'img/participants/success.svg' %}">
+                        {% elif check.status == 'rejected' %}
+                            <img style="margin-top: -3px;" src="{% static 'img/participants/close-circle.svg' %}">
+                        {% elif check.status == 'winner' %}
+                            <img style="margin-top: -3px;" src="{% static 'img/participants/Gift.svg' %}">
+                        {% else %}
+                            <img style="margin-top: -3px;" src="{% static 'img/participants/clock.svg' %}">
+                        {% endif %}
+                        {% if check.status == 'winner' %}
+                        Вы выиграли
+                        {% else %}
+                        {{ check.get_status_display }}
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        <img src="{% static 'img/participants/cash.svg' %}">
+                        <div class="value-table-history-checks">{% if check.amount %}{{ check.amount }} ₽{% else %}- ₽{% endif %}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        <img style="margin-top: -4px;" src="{% static 'img/participants/calendar.svg' %}">
+                        <div class="value-table-history-checks">{{ check.created_at|date:"H:i d.m.Y" }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center" style="gap: 6px;">
+                        <img src="{% static 'img/participants/info-circle.svg' %}"
+                        title="{{ check.message|default:'' }}"
+                        style="cursor: help;">
+                        <div class="value-table-history-checks value-table-history-checks-message">
+                            {% if check.message %}
+                            {{ check.message }}
+                            {% else %}
+                                {% if check.status == 'confirmed' %}Чек принят{% elif check.status == 'rejected' %}Чек отклонен{% else %}Чек на проверке{% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+        </div>
+        <div class="d-none history-checks-wrapper-mobile">
+            {% for check in checks %}
+            <div class="card-history-checks-mobile">
+                {# Шапка: превью чека + дата покупки, статус прижат вправо #}
+                <div class="head-card-history-checks-mobile">
+                    {% if check.receipt_image %}
+                    <img src="{% static 'img/participants/cbda8118c150756871dc6340cbd671564c7bf600.png' %}" class="img-qr-check" data-bs-toggle="modal" data-bs-target="#watchCheckModal" data-check-image="{{ check.receipt_image.url }}">
+                    {% else %}
+                    <img src="{% static 'img/participants/cbda8118c150756871dc6340cbd671564c7bf600.png' %}" class="img-qr-check">
+                    {% endif %}
+                    <div class="date-card-history-checks-mobile">
+                        <div class="label-card-history-checks-mobile">Дата покупки</div>
+                        <div class="value-table-history-checks">
+                            {% if check.date %}{{ check.date|date:"H:i d.m.Y" }}{% else %}—{% endif %}
+                        </div>
+                    </div>
+                    <div class="status-table-history-checks {% if check.status == 'confirmed' %}success{% elif check.status == 'rejected' %}danger{% elif check.status == 'winner' %}winner{% else %}warning{% endif %}">
+                        {% if check.status == 'confirmed' %}
+                            <img src="{% static 'img/participants/success.svg' %}">
+                        {% elif check.status == 'rejected' %}
+                            <img src="{% static 'img/participants/close-circle.svg' %}">
+                        {% elif check.status == 'winner' %}
+                            <img src="{% static 'img/participants/Gift.svg' %}">
+                        {% else %}
+                            <img src="{% static 'img/participants/clock.svg' %}">
+                        {% endif %}
+                        {% if check.status == 'winner' %}
+                        Вы выиграли
+                        {% else %}
+                        {{ check.get_status_display }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Остальные колонки таблицы — списком «подпись → значение» #}
+                <div class="rows-card-history-checks-mobile">
+                    <div class="row-card-history-checks-mobile">
+                        <img src="{% static 'img/participants/cash.svg' %}">
+                        <div class="label-card-history-checks-mobile">Сумма чека</div>
+                        <div class="value-table-history-checks">{% if check.amount %}{{ check.amount }} ₽{% else %}— ₽{% endif %}</div>
+                    </div>
+                    <div class="row-card-history-checks-mobile">
+                        <img src="{% static 'img/participants/calendar.svg' %}">
+                        <div class="label-card-history-checks-mobile">Дата регистрации</div>
+                        <div class="value-table-history-checks">{{ check.created_at|date:"H:i d.m.Y" }}</div>
+                    </div>
+                    <div class="row-card-history-checks-mobile row-card-history-checks-mobile--message">
+                        <div class="head-row-card-history-checks-mobile">
+                            <img src="{% static 'img/participants/info-circle.svg' %}">
+                            <div class="label-card-history-checks-mobile">Информация</div>
+                        </div>
+                        <div class="value-table-history-checks value-table-history-checks-message">
+                            {% if check.message %}
+                            {{ check.message }}
+                            {% else %}
+                                {% if check.status == 'confirmed' %}Чек принят{% elif check.status == 'rejected' %}Чек отклонен{% else %}Чек на проверке{% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="d-flex flex-column align-items-center justify-content-center">
+
+            <img src="{% static 'img/participants/520da97c28221527f524330108aee0d69d64f348.png' %}" class="img-empty-history-checks">
+
+            <div class="mt-1 zag-empty-history-checks text-center">Здесь будет история ваших чеков</div>
+            <div class="mt-1 desc-empty-history-checks">Вы не добавили еще ни одного чека</div>
+        </div>
+        {% endif %}
+        </div>{# /checks-table-container #}
+
+        {% if is_paginated %}
+        <div class="pagination mt-4" id="checks-pagination">
+
+            {% for page_num, page_link in page_items %}
+            <a href="?{{ page_link }}" class="link-pagination {% if page_obj.number == page_num %}active{% endif %}">{{ page_num }}</a>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+
+        <div class="mt-5 d-flex justify-content-between flex-wrap" style="row-gap: 12px;">
+            <div class="card-time-verif-card-history-checks">
+                <svg style="margin-top: -5px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2Z" stroke="var(--color-red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 16V11" stroke="var(--color-red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11.9941 8H12.0031" stroke="var(--color-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Иногда проверка вашего чека может занять до 5 рабочих дней
+            </div>
+            {% if is_valid_req_data_user %}
+            {% if request.user.is_blocked %}
+            <button class="btn-register-check" data-bs-toggle="modal" data-bs-target="#accountBlockedModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M18.3333 4.99984V7.0165C18.3333 8.33317 17.5 9.1665 16.1833 9.1665H13.3333V3.3415C13.3333 2.4165 14.0917 1.6665 15.0167 1.6665C15.925 1.67484 16.7583 2.0415 17.3583 2.6415C17.9583 3.24984 18.3333 4.08317 18.3333 4.99984Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1.66667 5.83317V17.4998C1.66667 18.1915 2.44998 18.5832 2.99998 18.1665L4.425 17.0998C4.75833 16.8498 5.22501 16.8832 5.52501 17.1832L6.90832 18.5748C7.23332 18.8998 7.76669 18.8998 8.09169 18.5748L9.49168 17.1748C9.78335 16.8832 10.25 16.8498 10.575 17.0998L12 18.1665C12.55 18.5748 13.3333 18.1832 13.3333 17.4998V3.33317C13.3333 2.4165 14.0833 1.6665 15 1.6665H5.83333H5C2.5 1.6665 1.66667 3.15817 1.66667 4.99984V5.83317Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 7.5H10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.625 10.8335H9.375" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Зарегистрировать чек
+            </button>
+            {% else %}
+            <button class="btn-register-check" data-bs-toggle="modal" data-bs-target="#checkModal" onclick="ym(110160633, 'reachGoal', 'check_btn'); return true;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M18.3333 4.99984V7.0165C18.3333 8.33317 17.5 9.1665 16.1833 9.1665H13.3333V3.3415C13.3333 2.4165 14.0917 1.6665 15.0167 1.6665C15.925 1.67484 16.7583 2.0415 17.3583 2.6415C17.9583 3.24984 18.3333 4.08317 18.3333 4.99984Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1.66667 5.83317V17.4998C1.66667 18.1915 2.44998 18.5832 2.99998 18.1665L4.425 17.0998C4.75833 16.8498 5.22501 16.8832 5.52501 17.1832L6.90832 18.5748C7.23332 18.8998 7.76669 18.8998 8.09169 18.5748L9.49168 17.1748C9.78335 16.8832 10.25 16.8498 10.575 17.0998L12 18.1665C12.55 18.5748 13.3333 18.1832 13.3333 17.4998V3.33317C13.3333 2.4165 14.0833 1.6665 15 1.6665H5.83333H5C2.5 1.6665 1.66667 3.15817 1.66667 4.99984V5.83317Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 7.5H10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.625 10.8335H9.375" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Зарегистрировать чек
+            </button>
+            {% endif %}
+            {% if DEBUG %}
+            <a href="" onclick="function deleteAllReceipts() {
+    fetch('/participants/delete-all-receipts/').then(() => location.reload());
+}; deleteAllReceipts()">ДЛЯ РАЗРАБОТКИ: Удалить все чеки</a>
+            {% endif %}
+            {% else %}
+            <a class="btn-register-check" href="{% url 'participants:profile' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M18.3333 4.99984V7.0165C18.3333 8.33317 17.5 9.1665 16.1833 9.1665H13.3333V3.3415C13.3333 2.4165 14.0917 1.6665 15.0167 1.6665C15.925 1.67484 16.7583 2.0415 17.3583 2.6415C17.9583 3.24984 18.3333 4.08317 18.3333 4.99984Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1.66667 5.83317V17.4998C1.66667 18.1915 2.44998 18.5832 2.99998 18.1665L4.425 17.0998C4.75833 16.8498 5.22501 16.8832 5.52501 17.1832L6.90832 18.5748C7.23332 18.8998 7.76669 18.8998 8.09169 18.5748L9.49168 17.1748C9.78335 16.8832 10.25 16.8498 10.575 17.0998L12 18.1665C12.55 18.5748 13.3333 18.1832 13.3333 17.4998V3.33317C13.3333 2.4165 14.0833 1.6665 15 1.6665H5.83333H5C2.5 1.6665 1.66667 3.15817 1.66667 4.99984V5.83317Z" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 7.5H10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.625 10.8335H9.375" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Заполнить данные
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+
+{% if instant_game and instant_game.is_enabled %}
+<div class="container section" style="margin-bottom: 24px;">
+    <div class="card-our-prizes instant-cta">
+        <div class="instant-cta__text">
+            <div class="zag-card-our-prizes">МОМЕНТАЛЬНЫЙ ПРИЗ</div>
+            <p class="instant-cta__hint">
+                {% if instant_game.already_won %}
+                    Вы уже выиграли моментальный приз: {{ instant_game.won_prize_name }}.
+                    Больше одного моментального приза за акцию выиграть нельзя.
+                {% elif instant_game.attempts_left %}
+                    Доступно попыток: {{ instant_game.attempts_left }}.
+                    Каждый принятый чек даёт ещё одну.
+                {% else %}
+                    Попыток пока нет. Зарегистрируйте чек — и откроете яйцо.
+                {% endif %}
+            </p>
+        </div>
+        {% if instant_game.can_play and not instant_game.already_won %}
+        <button type="button" class="button button--primary" data-egg-open>Открыть яйцо</button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="container section" style="margin-bottom: 60px;">
+    <div class="card-our-prizes">
+        <div class="d-flex align-items-center justify-content-between flex-wrap" style="row-gap: 12px;">
+            <div class="zag-card-our-prizes">ВАШИ ПРИЗЫ</div>
+            <div class="card-stat-card-our-prizes">
+
+                Подарков выиграно: <span>{{ win_prizes_total }} шт.</span>
+            </div>
+        </div>
+
+        {% if win_prize_cards %}
+        <div class="list-card-our-prizes mt-4">
+            <div class="row" style="row-gap: 16px;">
+                {% for card in win_prize_cards %}
+                <div class="col-md-3">
+                    {% include 'partials/win_prize_card.html' with card=card %}
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+        {% else %}
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <img src="{% static 'img/participants/dd3e2319d05e8bc2a964c589bc42336611fc939b.png' %}" class="img-empty-win-prizes">
+            <div class="mt-1 zag-empty-history-checks zag-empty-win-prizes text-center">Здесь будет история ваших призов</div>
+            <div class="mt-1 desc-empty-history-checks desc-empty-win-prizes">Вы не выиграли еще ни один приз</div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% comment %}
+Витрины призов и товаров — те же секции, что и на лендинге: отдельной вёрстки
+для кабинета нет, тексты и картинки правятся в одном месте.
+{% endcomment %}
+{% include 'partials/sections/instant_prizes.html' %}
+{% include 'partials/sections/weekly_prizes.html' %}
+{% include 'partials/sections/main_prize.html' %}
+{% include 'partials/sections/products.html' %}
+
+{% include 'watch_check_modal.html' %}
+{% include 'add_check_modal.html' %}
+{% include 'add_manual_check_modal.html' %}
+{% include 'success_add_check_modal.html' %}
+{% include 'account_blocked_modal.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{% static 'js/participants/dashboard.js' %}"></script>
+<script src="{% static 'js/participants/load-check.js' %}"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+{% endblock %}

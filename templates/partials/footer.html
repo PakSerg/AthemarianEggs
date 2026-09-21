@@ -1,0 +1,51 @@
+{% load static %}
+{% comment %}
+Общий подвал лендинга и кабинета. Реквизиты, документы и адрес поддержки
+берутся из CompanyInfo — в вёрстке их нет.
+{% endcomment %}
+<footer class="footer">
+    <div class="container">
+        <div class="footer__top">
+            <div class="footer__brand">
+                <div class="footer__logo">{{ company_info.brand_name }}</div>
+                <div class="footer__promo">«{{ company_info.promotion_name }}»</div>
+            </div>
+
+            <nav class="footer__links">
+                {% if company_info.rules %}
+                    <a href="{{ company_info.rules.url }}" target="_blank" rel="noopener">Правила акции</a>
+                {% endif %}
+                {% if company_info.privacy_policy %}
+                    <a href="{{ company_info.privacy_policy.url }}" target="_blank" rel="noopener">Обработка персональных данных</a>
+                {% endif %}
+                {% if company_info.personal_data_consent %}
+                    <a href="{{ company_info.personal_data_consent.url }}" target="_blank" rel="noopener">Согласие на обработку данных</a>
+                {% endif %}
+                {% if company_info.products_list %}
+                    <a href="{{ company_info.products_list.url }}" target="_blank" rel="noopener">Список товаров акции</a>
+                {% endif %}
+                <a href="{% url 'main:products' %}">Товары-участники</a>
+            </nav>
+
+            <div class="footer__support">
+                <div class="footer__support-label">Поддержка участников</div>
+                <a class="footer__support-email" href="mailto:{{ company_info.email }}">{{ company_info.email }}</a>
+            </div>
+        </div>
+
+        <p class="footer__text">{{ company_info.footer_text }}</p>
+
+        <div class="footer__legal">
+            <div>Организатор акции: {{ company_info.organization_name }}{% if company_info.inn %}, ИНН {{ company_info.inn }}{% endif %}{% if company_info.ogrn %}, ОГРН {{ company_info.ogrn }}{% endif %}</div>
+            {% if company_info.customer_name %}<div>Заказчик: {{ company_info.customer_name }}</div>{% endif %}
+            {% if company_info.legal_address %}<div>{{ company_info.legal_address }}</div>{% endif %}
+        </div>
+
+        <div class="footer__bottom">
+            <span>© {{ company_info.organization_name }}</span>
+            {% if company_info.cheqly_link %}
+                <a href="https://{{ company_info.cheqly_link }}" target="_blank" rel="noopener">Платформа CheqLy</a>
+            {% endif %}
+        </div>
+    </div>
+</footer>

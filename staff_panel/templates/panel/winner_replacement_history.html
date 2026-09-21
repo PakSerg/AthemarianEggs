@@ -1,0 +1,32 @@
+{% load panel_extras %}
+<ol class="panel-wr-history">
+  {% for item in history %}
+  <li class="panel-wr-history__item">
+    <div class="panel-wr-history__head">
+      <span class="panel-wr-history__num">Замена №{{ item.order }}</span>
+      <span class="panel-wr-tag panel-wr-tag--{% if item.mode == 'auto' %}auto{% else %}manual{% endif %}">{{ item.get_mode_display }}</span>
+      {% if not item.was_eligible %}
+      <span class="panel-wr-tag panel-wr-tag--warn">не по условиям</span>
+      {% endif %}
+      <span class="panel-wr-history__date">{{ item.created_at|date:"d.m.Y H:i" }}</span>
+    </div>
+    <div class="panel-wr-history__flow">
+      <span class="panel-wr-history__old">{{ item.old_participant_label }}</span>
+      <span class="panel-wr-history__arrow">→</span>
+      <span class="panel-wr-history__new">{{ item.new_participant_label }}</span>
+    </div>
+    <dl class="panel-wr-history__dl">
+      <dt>Чеки</dt>
+      <dd>
+        {% if item.old_receipt %}#{{ item.old_receipt.pk }}{% else %}—{% endif %}
+        →
+        {% if item.new_receipt %}#{{ item.new_receipt.pk }}{% else %}—{% endif %}
+      </dd>
+      {% if item.eligibility_note %}<dt>Условия</dt><dd>{{ item.eligibility_note }}</dd>{% endif %}
+      {% if item.reason %}<dt>Причина</dt><dd>{{ item.reason }}</dd>{% endif %}
+      <dt>Кто заменил</dt>
+      <dd>{% if item.created_by %}{{ item.created_by.email }}{% else %}—{% endif %}</dd>
+    </dl>
+  </li>
+  {% endfor %}
+</ol>

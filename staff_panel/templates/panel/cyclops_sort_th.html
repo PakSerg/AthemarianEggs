@@ -1,0 +1,19 @@
+{% comment %}
+Заголовок сортируемой колонки в таблицах раздела Cyclops.
+
+Ожидает:
+  col   — элемент sort_context из QueryMixin.build_sort_context
+          (link / state / reset_link / is_active); ссылки уже с якорем #payouts
+  label — подпись колонки
+  align — необязательно: 'right' для числовых колонок
+
+Отдельный шаблон от panel/sort_th.html: у раздела Cyclops собственная вёрстка
+таблиц (cyc-table), классы общего дашборда здесь не применяются.
+{% endcomment %}
+<th class="cyc-th{% if col.is_active %} is-sorted{% endif %}{% if align == 'right' %} cyc-cell--num{% endif %}">
+  <a href="?{{ col.link }}"
+     title="{% if col.state == 'asc' %}Сортировать по убыванию{% elif col.state == 'desc' %}Сбросить сортировку{% else %}Сортировать по возрастанию{% endif %}">
+    {{ label }}
+    <span class="cyc-th__arrow">{% if col.state == 'asc' %}↑{% elif col.state == 'desc' %}↓{% else %}↕{% endif %}</span>
+  </a>
+</th>

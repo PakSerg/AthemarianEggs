@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="section__title">Где купить</h1>
+        <p class="section__subtitle">Акция действует во всех магазинах России без ограничений по сети и формату</p>
+
+        {% if cities %}
+        <div class="cities">
+            {% for city in cities %}
+            <div class="cities__item">
+                <h2 class="cities__name">{{ city.name }}</h2>
+                <ul class="cities__addresses">
+                    {% for address in city.addresses.all %}<li>{{ address.name }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="section__note">Ограничений по магазинам нет — подойдёт чек из любой торговой точки России.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

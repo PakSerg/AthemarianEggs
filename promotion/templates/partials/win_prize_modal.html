@@ -1,0 +1,70 @@
+{% load static %}
+{% comment %}
+Модалка «Поздравляем! Вы выиграли приз!». Показывается авторизованному победителю
+по последней опубликованной победе (promotion.context_processors.win_prize_modal_context).
+Разметка отдаётся скрытой: открывать её или нет, решает winPrizeModal.js — он
+помнит, закрывал ли участник модалку крестиком/кнопкой.
+{% endcomment %}
+{% if win_prize_modal_card %}
+<div class="win-prize-modal"
+     data-win-prize-modal="{{ win_prize_modal_card.draw_result.pk }}"
+     hidden>
+    <div class="win-prize-modal__overlay" data-win-prize-modal-backdrop></div>
+
+    <div class="win-prize-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="winPrizeModalTitle">
+        <img class="win-prize-modal__gift" src="{% static 'img/win-prize-gift.svg' %}" alt="" aria-hidden="true">
+
+        <button type="button" class="win-prize-modal__close" data-win-prize-modal-close aria-label="Закрыть">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <div class="win-prize-modal__title" id="winPrizeModalTitle">
+            Поздравляем!<br>Вы выиграли приз!
+        </div>
+
+        <div class="win-prize-modal__card">
+            <div class="win-prize-modal__image">
+                <div class="win-prize-modal__badge">
+                    <img src="{% static 'img/participants/Gift.svg' %}" alt="">
+                    Вы выиграли
+                </div>
+                <img src="{% if win_prize_modal_card.prize.image %}{{ win_prize_modal_card.prize.image.url }}{% else %}{% static 'img/participants/Gift.svg' %}{% endif %}"
+                     alt="{{ win_prize_modal_card.prize.name|default:'Приз' }}">
+            </div>
+
+            <div class="win-prize-modal__body">
+                <div class="win-prize-modal__name">{{ win_prize_modal_card.prize.name }}</div>
+                {% if win_prize_modal_card.prize.description %}
+                <div class="win-prize-modal__description">{{ win_prize_modal_card.prize.description }}</div>
+                {% endif %}
+
+                <div class="win-prize-modal__rows">
+                    <div class="win-prize-modal__row">
+                        <span class="win-prize-modal__row-label">Дата покупки</span>
+                        <span class="win-prize-modal__row-value">{% if win_prize_modal_card.purchase_date %}{{ win_prize_modal_card.purchase_date|date:"H:i d.m.Y" }}{% else %}—{% endif %}</span>
+                    </div>
+                    <div class="win-prize-modal__row">
+                        <span class="win-prize-modal__row-label">Розыгрыш</span>
+                        <span class="win-prize-modal__row-value">{{ win_prize_modal_card.draw_label }}</span>
+                    </div>
+                </div>
+
+                <div class="win-prize-modal__status">
+                    <div class="win-prize-modal__status-label">Статус:</div>
+                    <div class="win-prize-modal__status-text">{{ win_prize_modal_card.status.text }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if win_prize_modal_card.status.has_link %}
+        <a class="win-prize-modal__button"
+           href="{{ win_prize_modal_card.status.link_url }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           data-win-prize-modal-action>{{ win_prize_modal_card.status.link_label }}</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

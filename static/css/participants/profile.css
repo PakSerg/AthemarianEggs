@@ -1,0 +1,440 @@
+.section {
+    padding-top: 32px;
+}
+
+.zag-section {
+    color: var(--color-black);
+    font-size: 40px;
+    line-height: 100%;
+    font-weight: 700;
+}
+
+.card-profile {
+    background-color: var(--color-gray-card);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 40px;
+    max-width: 100%;
+}
+
+.change-forms-profile {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E6E8F0;
+    max-width: 100%;
+    /* Вкладки никогда не переносятся и не распирают карточку:
+       если не влезают — скроллятся по горизонтали */
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+}
+
+.change-forms-profile::-webkit-scrollbar {
+    display: none;
+}
+
+.btn-change-forms-profile {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.btn-change-forms-profile.active {
+    color: var(--color-red);
+}
+
+/* Сетка полей */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.profile-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    min-width: 0;
+}
+
+.label {
+    color: var(--color-black);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.required-star {
+    color: #ED4A4A;
+}
+
+.required-star[hidden] {
+    display: none;
+}
+
+.label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.no-middle-name-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    margin: 0;
+    max-width: 100%;
+}
+
+.no-middle-name-toggle__text {
+    color: #787E91;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 130%;
+    min-width: 0;
+}
+
+.no-middle-name-toggle__input {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    cursor: pointer;
+    accent-color: var(--color-red);
+}
+
+.form-profile .form-control.is-disabled-field {
+    background-color: var(--color-gray-card);
+    border-color: var(--color-gray-card);
+    cursor: not-allowed;
+}
+
+/* Инпуты */
+.form-profile .form-control,
+.form-profile-sucuri .form-control {
+    background-color: var(--color-white);
+    border: 1px solid #E6E8F0;
+    padding: 14px;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: none;
+    color: var(--color-black);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.form-profile .form-control::placeholder,
+.form-profile-sucuri .form-control::placeholder {
+    color: #787E91;
+}
+
+.form-profile .form-control:focus,
+.form-profile-sucuri .form-control:focus {
+    border-color: var(--color-red);
+}
+
+.form-profile .readonly {
+    background-color: var(--color-gray-card);
+    border-color: var(--color-gray-card);
+    cursor: auto;
+}
+
+.form-profile .readonly:focus {
+    border-color: var(--color-gray-card);
+}
+
+/* Футер формы */
+.form-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.submit-btn {
+    background-color: var(--color-red);
+    border: 1px solid var(--color-red);
+    border-radius: 12px;
+    padding: 12px 18px;
+    color: #FFFFFF;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.submit-btn.is-disabled,
+.submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.text-submit-policy {
+    color: #030E36B2;
+    font-size: 16px;
+    font-weight: 500;
+    max-width: 508px;
+}
+
+.text-submit-policy a {
+    color: var(--color-red);
+    text-decoration: underline;
+}
+
+/* Уведомления на email */
+.notifications-field {
+    padding: 24px 0;
+}
+
+/* Подпись слева, чекбокс справа */
+.notifications-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin: 0;
+    max-width: 100%;
+}
+
+.notifications-toggle__text {
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 130%;
+    min-width: 0;
+}
+
+.notifications-toggle__input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    cursor: pointer;
+    accent-color: var(--color-red);
+}
+
+/* Пароль */
+.form-profile-sucuri {
+    margin-top: 16px;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+    z-index: 10;
+}
+
+.error-password {
+    color: #F04D4D;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.errorlist {
+    padding: 0;
+}
+
+/* Flatpickr — фикс позиции при body: flex */
+.flatpickr-calendar {
+    top: 90px !important;
+    left: 0 !important;
+    position: absolute;
+}
+
+/* Город */
+.city-autocomplete {
+    position: relative;
+}
+
+.city-suggestions-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    border: 1px solid #E6E8F0;
+    border-radius: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 50;
+    display: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red) var(--color-gray-card);
+}
+
+.city-suggestions-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.city-suggestions-list::-webkit-scrollbar-thumb {
+    background-color: var(--color-red);
+    border-radius: 4px;
+}
+
+.city-suggestion-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 400;
+    touch-action: manipulation;
+}
+
+.city-suggestion-item:hover,
+.city-suggestion-item.is-active {
+    background: #F3F4F8;
+}
+
+.form-profile #id_city.city-required-invalid {
+    border-color: #ED4A4A !important;
+}
+
+.city-field-error {
+    color: #ED4A4A;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+/* Банк */
+.bank-autocomplete {
+    position: relative;
+}
+
+.bank-suggestions-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    border: 1px solid #E6E8F0;
+    border-radius: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 50;
+    display: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red) var(--color-gray-card);
+}
+
+.bank-suggestions-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.bank-suggestions-list::-webkit-scrollbar-thumb {
+    background-color: var(--color-red);
+    border-radius: 4px;
+}
+
+.bank-suggestion-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--color-black);
+    font-size: 16px;
+    font-weight: 400;
+    touch-action: manipulation;
+}
+
+.bank-suggestion-item:hover,
+.bank-suggestion-item.is-active {
+    background: #F3F4F8;
+}
+
+.bank-suggestion-item .bank-suggestion-bik {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+
+.form-profile #id_bank.bank-required-invalid {
+    border-color: #ED4A4A !important;
+}
+
+.bank-field-error {
+    color: #ED4A4A;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+@media (max-width: 992px) {
+    .profile-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .profile-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .zag-section {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .card-profile {
+        padding: 16px;
+    }
+
+    /* Все три вкладки в строку не помещаются — вместо переноса, который ломал
+       карточку и вылезал за экран, скроллим их по горизонтали.
+       Отрицательные margin'ы дают скроллу «выехать» на всю ширину карточки,
+       чтобы разделительная линия не обрывалась по краям. */
+    .change-forms-profile {
+        /* max-width: 100% с базового правила не даёт вкладкам «выехать»
+           на всю ширину карточки — снимаем ограничение */
+        max-width: none;
+        margin-left: -16px;
+        margin-right: -16px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .profile-grid,
+    .profile-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .submit-btn {
+        width: 100%;
+    }
+
+    .form-footer {
+        margin-top: 24px;
+    }
+
+    .text-submit-policy {
+        max-width: 100%;
+        font-size: 14px;
+    }
+}

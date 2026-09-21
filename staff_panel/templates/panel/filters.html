@@ -1,0 +1,75 @@
+{% comment %}
+Панель фильтров списка — единая для всех страниц дашборда, повторяет фронтенд
+фильтров FarPostLogs: строка поиска, кнопка «Добавить фильтр» с двухуровневым
+меню и чипы активных фильтров.
+
+Ожидает в контексте (см. staff_panel.services.filters.FilterSet.context):
+  filter_catalog, filter_chips, filter_hidden_fields, filter_reset_url
+  search_placeholder, filters.q, search_clear_url
+{% endcomment %}
+<div class="panel-filters">
+  <form method="get" class="panel-search-wrap">
+    {% for h in filter_hidden_fields %}
+    <input type="hidden" name="{{ h.name }}" value="{{ h.value }}">
+    {% endfor %}
+    <input type="text" name="q" value="{{ filters.q }}"
+           class="panel-search-input{% if filters.q %} panel-search-input--clearable{% endif %}"
+           placeholder="{{ search_placeholder|default:'Поиск' }}" autocomplete="off">
+    {% if filters.q %}
+    <a href="?{{ search_clear_url }}" class="panel-search-clear-btn" title="Очистить поиск" aria-label="Очистить поиск">
+      <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </a>
+    {% endif %}
+    <button type="submit" class="panel-search-btn" aria-label="Найти">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M14.3333 14.3333L16.6666 16.6666M15.9999 9.66658C15.9999 6.16878 13.1644 3.33325 9.66658 3.33325C6.16878 3.33325 3.33325 6.16878 3.33325 9.66658C3.33325 13.1644 6.16878 15.9999 9.66658 15.9999C13.1644 15.9999 15.9999 13.1644 15.9999 9.66658Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </form>
+
+  <div class="panel-filter-bar">
+    <svg class="panel-filter-bar__icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M1.75 3.5H12.25M3.5 7H10.5M5.25 10.5H8.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <div class="panel-filter-bar__scroll">
+      <div class="panel-filter-dropdown-wrap">
+        <button type="button" class="panel-filter-add-btn{% if filter_chips %} panel-filter-add-btn--active{% endif %}"
+                id="panel-filter-toggle" aria-expanded="false" aria-haspopup="true" aria-controls="panel-filter-menus">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M6 11C8.75 11 11 8.75 11 6C11 3.25 8.75 1 6 1C3.25 1 1 3.25 1 6C1 8.75 3.25 11 6 11Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M6 4V8M4 6H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Добавить фильтр
+        </button>
+        <div class="panel-filter-menus" id="panel-filter-menus" hidden>
+          <div class="panel-filter-menu panel-filter-menu--primary" id="panel-filter-menu-primary" role="menu" aria-label="Поле фильтра"></div>
+          <div class="panel-filter-menu panel-filter-menu--secondary" id="panel-filter-menu-secondary" role="menu" hidden aria-label="Значение фильтра"></div>
+        </div>
+      </div>
+
+      {% for chip in filter_chips %}
+      <span class="panel-filter-chip">
+        <span class="panel-filter-chip__category">{{ chip.category_label }}:</span>
+        <span class="panel-filter-chip__value-box">
+          <span class="panel-filter-chip__value">{{ chip.value_label }}</span>
+        </span>
+        <a href="{{ chip.remove_href }}" class="panel-filter-chip__rm" title="Убрать фильтр"
+           aria-label="Убрать фильтр «{{ chip.category_label }}»">×</a>
+      </span>
+      {% endfor %}
+    </div>
+
+    {% if filter_chips %}
+    <div class="panel-filter-bar__end">
+      <a href="{{ filter_reset_url }}" class="panel-filter-clear-btn" title="Сбросить все фильтры">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Сбросить всё
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{{ filter_catalog|json_script:"panel-filter-catalog" }}

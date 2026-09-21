@@ -1,0 +1,50 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_title %}{{ email_title }} — {{ site_name }}{% endblock %}
+
+{% block preheader %}
+<div style="display:none;max-height:0;overflow:hidden;">
+    Ваш код: {{ code }}. Действует {{ ttl_minutes }} мин.
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block email_content %}
+<h1 style="margin:0 0 16px 0;font-size:42px;line-height:1.2;font-weight:700;color:#FFFFFF;text-align:center;text-transform:uppercase;">
+    {{ heading }}
+</h1>
+<p style="margin:0 0 32px 0;font-size:24px;line-height:1.2;color:#C7CCDC;text-align:center;font-weight:350;">
+    {{ intro_text|linebreaksbr }}
+</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 32px 0;">
+    <tr>
+        <td align="center" style="background-color:#212B51;border-radius:18px;padding:36px;">
+            <p style="margin:0 0 20px 0;font-size:24px;font-weight:350;color:#C7CCDC;font-family:'Normalidad',Arial,sans-serif;">
+                Ваш код:
+            </p>
+            <p style="font-size:42px;line-height:1.1;font-weight:700;color:#FFFFFF;margin:0;letter-spacing:12%;font-family:'Normalidad',Arial,sans-serif;">
+                {{ code }}
+            </p>
+        </td>
+    </tr>
+</table>
+<p style="margin:0 0 32px 0;font-size:24px;line-height:1.2;color:#C7CCDC;text-align:center;font-weight:350;">
+    Код действует {{ ttl_minutes }} мин.
+</p>
+{% if action_url %}
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td align="center">
+            <a href="{{ action_url }}" style="background-color:#C4122F;color:#FFFFFF;font-size:24px;font-weight:500;text-decoration:none;padding:20px 32px;border-radius:10px;
+            display:block;width:100%;box-sizing:border-box;text-align:center;text-transform:uppercase;font-family:'Normalidad',Arial,sans-serif;">
+                {{ action_label }}
+            </a>
+        </td>
+    </tr>
+</table>
+{% endif %}
+<p style="margin:64px 0 0 0;font-size:18px;line-height:1.4;color:#8B93AD;text-align:center;font-family:'Normalidad',Arial,sans-serif;">
+    {{ footer_note|safe }}
+</p>
+{% endblock %}

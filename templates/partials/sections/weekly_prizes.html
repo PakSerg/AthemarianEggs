@@ -1,0 +1,24 @@
+{% with block=blocks.weekly_prizes %}
+{% if block %}
+<section class="section" id="prizes">
+    <div class="container">
+        <h2 class="section__title">{{ block.title|default:"Еженедельные призы" }}</h2>
+        {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+
+        {% if week_prizes %}
+        <ul class="prize-grid">
+            {% for prize in week_prizes %}
+            <li class="prize-card">
+                <div class="prize-card__media"><img src="{{ prize.image.url }}" alt="{{ prize.name }}" loading="lazy"></div>
+                <div class="prize-card__name">{{ prize.name }}</div>
+                <div class="prize-card__caption">{{ prize.caption }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
+{% endwith %}

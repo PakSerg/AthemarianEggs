@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section section--plug">
+    <div class="container plug">
+        <div class="plug__brand">404</div>
+        <h1 class="plug__title">Страница не найдена</h1>
+        <p class="plug__subtitle">Похоже, такой страницы у нас нет. Вернитесь на главную и попробуйте ещё раз.</p>
+        <div class="section__actions">
+            <a class="button button--primary" href="{% url 'main:home' %}">На главную</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

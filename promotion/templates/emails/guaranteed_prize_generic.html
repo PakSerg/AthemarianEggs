@@ -1,0 +1,16 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_title %}{{ subject }} — {{ site_name }}{% endblock %}
+
+{% block email_content %}
+<div style="font-family:'Normalidad',Arial,sans-serif;font-size:20px;line-height:1.6;color:#FFFFFF;">
+    {{ body_text|linebreaks }}
+</div>
+{% if unsubscribe_url %}
+<p style="text-align:center;margin:24px 0 0 0;">
+    <a href="{{ unsubscribe_url }}" style="display:inline-block;color:#8B93AD;font-family:'Normalidad',Arial,sans-serif;font-size:14px;font-weight:400;text-decoration:underline;">
+        Отписаться от писем о статусе чека
+    </a>
+</p>
+{% endif %}
+{% endblock %}

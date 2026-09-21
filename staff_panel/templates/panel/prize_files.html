@@ -1,0 +1,218 @@
+{% extends "panel/base.html" %}
+
+{% block title %}Файлы призов{% endblock %}
+
+{% block content %}
+<section class="panel-page">
+  <div class="panel-page__head panel-page__head--row">
+    <div class="panel-page__head-titles">
+      <h1>Файлы призов</h1>
+      <p class="panel-muted">Всего файлов: {{ files_count }}</p>
+    </div>
+    <a href="{% url 'panel:winners' %}" class="panel-btn panel-btn--ghost">← К победителям</a>
+  </div>
+
+  {% if can_manage_prize_fulfillment and not kind_choices %}
+  <div class="panel-upload-card">
+    <h2 class="panel-upload-card__title">Нет ни одного электронного приза</h2>
+    <p class="panel-upload-card__hint">
+      Файлы призов загружаются только под электронные призы — сертификаты, промокоды и т.п.
+      Откройте нужный приз на вкладке <a href="{% url 'panel:prizes' %}">«Призы»</a> и включите
+      галочку «Электронный приз» — после этого он появится здесь в списке для загрузки.
+    </p>
+  </div>
+  {% endif %}
+
+  {% if can_manage_prize_fulfillment and kind_choices %}
+  <div class="panel-upload-card">
+    <h2 class="panel-upload-card__title">Загрузить файлы электронных призов</h2>
+    <p class="panel-upload-card__hint">
+      Выберите приз и тип розыгрыша, затем файлы — загружать можно партиями, хоть по одному,
+      хоть все сразу. Имя файла — его уникальный идентификатор: файл с уже существующим именем
+      не загрузится, и вся партия будет отклонена целиком. Максимальный совокупный размер
+      загружаемых за раз файлов — {{ max_batch_mb }} МБ.
+      Загруженные файлы лежат свободными, пока их не выдадут победителю в колонке «Файл приза».
+      Склад — это приз плюс тип розыгрыша, и он общий на всю акцию: под неделю грузить не нужно,
+      один файл подойдёт победителю любой недели. А вот еженедельные и ежемесячные партии одного
+      приза не смешиваются — это разные склады.
+      В списке призов — только отмеченные как электронные.
+    </p>
+
+    <form method="post" action="{% url 'panel:prize_file_upload' %}" enctype="multipart/form-data"
+          class="panel-upload-form" id="panel-prize-file-form" data-max-batch-mb="{{ max_batch_mb }}">
+      {% csrf_token %}
+      <div class="panel-upload-form__field">
+        <label class="panel-upload-form__label">Приз</label>
+        <div class="panel-custom-select panel-custom-select--searchable" data-name="prize"
+             data-all-label="— выберите приз —" data-search-placeholder="Поиск приза…" id="panel-prize-file-prize"
+             title="Один пункт на приз, а не на каждую неделю: недели общий склад приза не делят">
+          <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+            <span class="panel-custom-select__value">— выберите приз —</span>
+            <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="panel-custom-select__panel" hidden>
+            <ul class="panel-custom-select__list">
+              {% for kind in kind_choices %}
+              <li class="panel-custom-select__item" data-value="{{ kind.pk }}" data-label="{{ kind.name }}">
+                <span class="panel-custom-select__check"></span>{{ kind.name }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="panel-upload-form__field">
+        <label class="panel-upload-form__label">Тип розыгрыша</label>
+        <div class="panel-custom-select" data-name="draw_type" id="panel-prize-file-draw-type"
+             title="У еженедельных и ежемесячных розыгрышей одного приза разные склады файлов. Список ограничен теми розыгрышами, в которых выбранный приз действительно разыгрывается">
+          <button type="button" class="panel-custom-select__trigger" aria-expanded="false">
+            <span class="panel-custom-select__value">— сначала выберите приз —</span>
+            <svg class="panel-custom-select__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="panel-custom-select__panel" hidden>
+            <ul class="panel-custom-select__list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="panel-upload-form__field">
+        <label class="panel-upload-form__label">Файлы</label>
+        <label class="panel-dropzone">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+            <path d="M8 11V3M5 6l3-3 3 3M3 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="panel-dropzone__text">Перетащите файлы сюда или нажмите, чтобы выбрать</span>
+          <input type="file" name="files" multiple>
+        </label>
+      </div>
+      <div class="panel-upload-form__field">
+        <button type="submit" class="panel-btn">Загрузить</button>
+      </div>
+    </form>
+    <p class="panel-wwf-error" id="panel-prize-file-error" hidden></p>
+    {{ kind_draw_types|json_script:"panel-kind-draw-types" }}
+    {{ draw_type_labels|json_script:"panel-draw-type-labels" }}
+  </div>
+  {% endif %}
+
+  {% if stats %}
+  <div class="panel-file-summary">
+    <div class="panel-file-summary__head">
+      <div class="panel-file-summary__title">Склад файлов призов</div>
+      <p class="panel-file-summary__hint">
+        «Свободные» ещё никому не выданы — именно из них выбирают файл в колонке «Файл приза»
+        на странице «Победители». «Выданные» уже закреплены за победителями.
+      </p>
+    </div>
+    <div class="panel-file-summary__totals">
+      <div class="panel-file-total">
+        <strong class="panel-file-total__value">{{ stats_totals.total }}</strong>
+        <span class="panel-file-total__label">всего файлов</span>
+      </div>
+      <div class="panel-file-total panel-file-total--free">
+        <strong class="panel-file-total__value">{{ stats_totals.free }}</strong>
+        <span class="panel-file-total__label">свободны</span>
+      </div>
+      <div class="panel-file-total panel-file-total--assigned">
+        <strong class="panel-file-total__value">{{ stats_totals.assigned }}</strong>
+        <span class="panel-file-total__label">выданы победителям</span>
+      </div>
+    </div>
+
+    <div class="panel-file-stats">
+      {% for stat in stats %}
+      <div class="panel-file-stat">
+        <div class="panel-file-stat__title">{{ stat.prize }}</div>
+        <div class="panel-file-stat__bar" aria-hidden="true">
+          <span class="panel-file-stat__bar-fill" style="width:{% widthratio stat.free stat.total 100 %}%"></span>
+        </div>
+        <div class="panel-file-stat__summary">
+          Свободно <strong>{{ stat.free }}</strong> из <strong>{{ stat.total }}</strong>{% if stat.assigned %} · выдано {{ stat.assigned }}{% endif %}
+        </div>
+        {% if stat.rows|length > 1 %}
+        <ul class="panel-file-stat__rows">
+          {% for r in stat.rows %}
+          <li class="panel-file-stat__row">
+            <span class="panel-file-stat__row-name">{{ r.draw_type_label }}</span>
+            <span class="panel-file-stat__row-nums" title="свободно из всего">
+              <span class="panel-file-stat__row-free">{{ r.free }}</span>
+              <span class="panel-file-stat__row-sep">/</span>
+              <span>{{ r.total }}</span>
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="panel-file-stat__single">{{ stat.rows.0.draw_type_label }} розыгрыш</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% include "panel/filters.html" %}
+
+  <div class="panel-table-wrap">
+    <table class="panel-table panel-table--compact">
+      <thead>
+        <tr>
+          {% include "panel/sort_th.html" with col=sort_context.name label="Имя файла" %}
+          {% include "panel/sort_th.html" with col=sort_context.prize label="Приз" %}
+          {% include "panel/sort_th.html" with col=sort_context.draw_type label="Тип розыгрыша" %}
+          <th>Состояние</th>
+          <th>Кому выдан</th>
+          {% include "panel/sort_th.html" with col=sort_context.uploaded_at label="Загружен" %}
+          <th class="panel-cell--center">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prize_file in page_obj %}
+        <tr>
+          <td>{{ prize_file.name }}</td>
+          <td>{{ prize_file.kind.name|default:"—" }}</td>
+          <td class="panel-nowrap">{{ prize_file.get_draw_type_display }}</td>
+          <td>
+            {% if prize_file.is_assigned %}
+            <span class="panel-badge panel-badge--gray">Выдан</span>
+            {% else %}
+            <span class="panel-badge panel-badge--green">Свободен</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if prize_file.draw_result %}
+            <a href="{% url 'panel:winners' %}?open=weekly:{{ prize_file.draw_result.pk }}">{{ prize_file.draw_result.participant }}</a>
+            {% elif prize_file.main_draw_result %}
+            <a href="{% url 'panel:winners' %}?open=main:{{ prize_file.main_draw_result.pk }}">{{ prize_file.main_draw_result.participant }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td class="panel-nowrap">{{ prize_file.uploaded_at|date:"d.m.Y H:i" }}</td>
+          <td class="panel-actions-cell panel-cell--center">
+            <div class="panel-actions-cell__inner">
+              <a href="{% url 'panel:prize_file_download' prize_file.pk %}" class="panel-drawer__icon-btn" title="Скачать" target="_blank">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              {% if can_manage_prize_fulfillment and not prize_file.is_assigned %}
+              <form method="post" action="{% url 'panel:prize_file_delete' prize_file.pk %}" style="margin:0"
+                    data-panel-confirm="Удалить файл «{{ prize_file.name }}» без возможности восстановления?">
+                {% csrf_token %}
+                <button type="submit" class="panel-drawer__icon-btn" title="Удалить файл">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8a1 1 0 0 0 1 .9h3.8a1 1 0 0 0 1-.9l.6-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="panel-empty">Файлы призов не найдены</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "panel/pagination.html" %}
+  </div>
+</section>
+{% endblock %}

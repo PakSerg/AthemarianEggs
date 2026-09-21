@@ -1,0 +1,186 @@
+html {
+    scrollbar-gutter: stable;
+}
+
+/* ── Защита от горизонтального скролла ────────── */
+/* Ни одна страница ЛК не должна прокручиваться вбок: декоративные картинки,
+   широкие таблицы и длинные строки обрезаются, а не распирают вьюпорт. */
+/* overflow-x задаём только на html — он пробрасывается на вьюпорт.
+   Такое же правило на body сделало бы body отдельным скролл-контейнером
+   и сломало бы прокрутку страницы. */
+html {
+    overflow-x: hidden;
+}
+
+body {
+    max-width: 100%;
+}
+
+/* Длинные email, токены и ссылки переносятся, а не выталкивают контейнер */
+.lk-main {
+    overflow-wrap: break-word;
+}
+
+/* min-width: auto у flex/grid-элементов не даёт им сжиматься меньше контента —
+   из-за этого сетки вылезают за край экрана */
+.lk-main .row > *,
+.lk-main [class*="-grid"] > * {
+    min-width: 0;
+}
+
+body {
+    background-color: var(--color-white) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body.modal-open {
+    display: block;
+    /* Скроллбар зарезервирован через scrollbar-gutter, поэтому padding-right,
+       который добавляет Bootstrap для компенсации исчезающего скроллбара,
+       не нужен и только сдвигает контент относительно фиксированной шапки. */
+    padding-right: 0 !important;
+}
+
+main {
+    flex: 1;
+}
+
+ul {
+    margin: 0;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.footer a,
+.footer__item a,
+.footer__extra-links a,
+.footer__mobile-logo,
+.footer__logo {
+    color: inherit;
+}
+
+/* ── Алерты ─────────────────────────────────── */
+.lk-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    position: fixed;
+    right: 40px;
+    bottom: 20px;
+    z-index: 99999;
+    font-size: 15px;
+    font-weight: 400;
+    max-width: 360px;
+    box-shadow: 1px 1px 8px 2px #52535433;
+}
+
+.lk-alert--success {
+    background-color: #FFFFFF;
+    border: 1px solid #DFE3EC;
+    color: var(--color-black);
+}
+
+.lk-alert--error {
+    background-color: #FFFAFA;
+    border: 1px solid #F04D4D;
+    color: #F04D4D;
+}
+
+.lk-alert__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: auto;
+    color: inherit;
+    font-size: 14px;
+    opacity: 0.6;
+    padding: 0 0 0 8px;
+}
+
+/* ── User-блок в шапке ────────────────────────── */
+.lk-user-menu {
+    position: relative;
+}
+
+.lk-user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.lk-user-trigger:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.lk-user-icon {
+    width: 32px;
+    height: 32px;
+    background-color: #F5F5F5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-red);
+}
+
+/* Дропдаун */
+.lk-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background-color: #FFFFFF;
+    border: 1px solid #E8EAED;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    display: none;
+    flex-direction: column;
+    padding: 8px;
+    z-index: 9999;
+}
+
+.lk-dropdown.lk-dropdown--open {
+    display: flex;
+}
+
+.lk-dropdown__item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--color-black);
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.lk-dropdown__item:hover {
+    background-color: #F5F7FA;
+}
+
+.lk-dropdown__item--logout {
+    color: #F04D4D;
+    margin-top: 4px;
+    border-top: 1px solid #F0F0F0;
+    padding-top: 12px;
+}
+
+/* ── Алерты ─────────────────────────────────── */
+@media (max-width: 768px) {
+    .lk-alert {
+        right: 0;
+        left: 0;
+        bottom: 0;
+        border-radius: 0;
+        max-width: 100%;
+    }
+}

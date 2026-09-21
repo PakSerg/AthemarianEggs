@@ -1,0 +1,27 @@
+{% comment %}
+Заголовок сортируемой колонки — общий для всех таблиц дашборда.
+
+Ожидает:
+  col   — элемент sort_context из QueryMixin.build_sort_context (link/state/reset_link/is_active)
+  label — подпись колонки
+  align — необязательно: 'right' | 'center' (по умолчанию по левому краю)
+  title — необязательная подсказка на наведении
+
+Поведение как в Django Admin: нейтральная стрелка подсказывает, что колонку
+можно сортировать; активная колонка подсвечена и рядом с ней крестик сброса.
+{% endcomment %}
+<th class="panel-th--sortable{% if col.is_active %} is-sorted{% endif %}{% if align == 'right' %} panel-cell--num{% elif align == 'center' %} panel-cell--center{% endif %}"
+    {% if col.state == 'asc' %}aria-sort="ascending"{% elif col.state == 'desc' %}aria-sort="descending"{% endif %}>
+  <span class="panel-th__inner">
+    <a href="?{{ col.link }}" class="panel-th__link"
+       title="{% if title %}{{ title }} — {% endif %}{% if col.state == 'asc' %}Сортировать по убыванию{% elif col.state == 'desc' %}Сбросить сортировку{% else %}Сортировать по возрастанию{% endif %}">
+      <span class="panel-th__label">{{ label }}</span>
+      <span class="panel-th__arrow panel-th__arrow--{{ col.state|default:'none' }}" aria-hidden="true">
+        {% if col.state == 'asc' %}↑{% elif col.state == 'desc' %}↓{% else %}↕{% endif %}
+      </span>
+    </a>
+    {% if col.is_active %}
+    <a href="?{{ col.reset_link }}" class="panel-th__reset" title="Сбросить сортировку" aria-label="Сбросить сортировку">×</a>
+    {% endif %}
+  </span>
+</th>

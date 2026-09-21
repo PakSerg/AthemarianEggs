@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Механизм валидации чеков — {{ company_info.brand_name }}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; font-size: 13px; }
+  .doc { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 12px; margin-bottom: 28px; }
+  h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #888; margin: 32px 0 12px; border-top: 1px solid #eee; padding-top: 16px; }
+  .flow { display: flex; flex-direction: column; }
+  .arrow-down { text-align: center; font-size: 16px; color: #aaa; line-height: 1; padding: 3px 0; margin-left: 110px; }
+  .node { border-radius: 8px; padding: 10px 14px; flex: 1; line-height: 1.45; }
+  .node.start  { background: #f0f0f0; border: 1.5px solid #ddd; font-weight: 600; max-width: 260px; }
+  .node.check  { background: #fff8e6; border: 1.5px solid #f0c840; }
+  .node.action { background: #f5f5f5; border: 1.5px solid #e0e0e0; }
+  .node.ok     { background: #eafaf1; border: 1.5px solid #52c47a; }
+  .node.warn   { background: #fff3e0; border: 1.5px solid #f5a623; }
+  .node.bad    { background: #fdecea; border: 1.5px solid #e05252; }
+  .node.info   { background: #f0f4ff; border: 1.5px solid #a0b4e8; }
+  .node.ai     { background: #f5f0ff; border: 1.5px solid #b08ee8; }
+  .node .label  { font-weight: 600; font-size: 12px; margin-bottom: 3px; }
+  .node .detail { font-size: 11px; color: #666; }
+  .flow-row { display: flex; align-items: stretch; gap: 8px; }
+  .two-col { display: flex; gap: 8px; margin: 4px 0; }
+  .three-col { display: flex; gap: 8px; margin: 4px 0; }
+  .col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .branch-label { font-size: 10px; font-weight: 600; color: #888; padding: 1px 6px; background: #f0f0f0; border-radius: 4px; white-space: nowrap; margin-bottom: 2px; }
+  .connector { width: 1.5px; flex: 1; background: #ddd; min-height: 10px; margin: 0 auto; }
+  .loop-badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 10px; background: #f0f4ff; border: 1px solid #a0b4e8; color: #3a5cbd; margin-left: 6px; font-weight: 600; }
+  .loop-box { border: 1.5px dashed #ddd; border-radius: 10px; padding: 12px; margin-bottom: 4px; }
+  .loop-box-title { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 10px; }
+  .validators-row { display: flex; gap: 8px; margin: 8px 0; }
+  .validator-block { flex: 1; border-radius: 8px; padding: 10px 12px; }
+  .v-keywords { background: #eafaf1; border: 1.5px solid #52c47a; }
+  .v-rapidfuzz { background: #f0f4ff; border: 1.5px solid #a0b4e8; }
+  .v-ai { background: #f5f0ff; border: 1.5px solid #b08ee8; }
+  .v-label { font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+  .v-detail { font-size: 11px; color: #555; line-height: 1.5; }
+  .result-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  .result-table th { text-align: left; padding: 6px 10px; font-size: 10px; font-weight: 700; border-bottom: 2px solid #e0e0e0; color: #888; text-transform: uppercase; }
+  .result-table td { padding: 7px 10px; font-size: 11px; border-bottom: 1px solid #f0f0f0; line-height: 1.5; vertical-align: top; }
+  .result-table tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+  .badge.confirmed { background: #eafaf1; color: #1a7a45; }
+  .badge.pending   { background: #fff3e0; color: #b05e00; }
+  .badge.rejected  { background: #fdecea; color: #c0392b; }
+  .risk-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .risk-table th { text-align: left; padding: 7px 10px; font-size: 11px; font-weight: 700; border-bottom: 2px solid #e0e0e0; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+  .risk-table td { padding: 8px 10px; vertical-align: top; border-bottom: 1px solid #f0f0f0; font-size: 12px; line-height: 1.5; }
+  .risk-table tr:last-child td { border-bottom: none; }
+  .sev { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+  .sev.high { background: #fdecea; color: #c0392b; }
+  .sev.med  { background: #fff3e0; color: #b05e00; }
+  .sev.low  { background: #eafaf1; color: #1a7a45; }
+  .proposals { display: flex; flex-direction: column; gap: 8px; }
+  .proposal { border-radius: 8px; padding: 12px 14px; }
+  .proposal.p-warn { border: 1px solid #f5dba0; border-left: 3px solid #f5a623; background: #fffbf0; }
+  .proposal.p-blue { border: 1px solid #a8d0eb; border-left: 3px solid #3a8fc4; background: #f5faff; }
+  .proposal.p-green { border: 1px solid #a0ddb8; border-left: 3px solid #52c47a; background: #f5fff8; }
+  .proposal .p-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+  .proposal .p-body  { font-size: 12px; color: #555; line-height: 1.55; }
+  .proposal .p-tag   { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-bottom: 5px; }
+  .tag-todo { background: #fff3e0; color: #b05e00; }
+  .tag-idea { background: #f0f4ff; color: #3a5cbd; }
+  code { font-family: 'SF Mono', 'Fira Mono', monospace; background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+  .note { font-size: 11px; color: #888; background: #fffbe6; border-radius: 6px; padding: 8px 12px; margin-top: 8px; border-left: 3px solid #f0c840; }
+  .note.info { background: #f0f4ff; border-left-color: #a0b4e8; color: #444; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .doc { padding: 16px; } }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <h1>Механизм валидации чеков — {{ company_info.brand_name }}</h1>
+  <div class="subtitle">Схема работы: предобработка, валидация магазина, три ветвления (keywords + rapidfuzz + AI), итоговый статус · Актуально на 06.07.2026</div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Этап 1 — Предобработка и базовые проверки</h2>
+
+  <div class="flow">
+    <div class="flow-row">
+      <div class="node start"><div class="label">Чек загружен участником</div><div class="detail">QR-код / фото чека / ФН + ФД + ФП вручную</div></div>
+    </div>
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <div class="node action"><div class="label">Разбор QR-payload</div><div class="detail">Приоритет: <code>qr_code_str</code> → декодирование из фото → сборка из ФН/ФД/ФП/дата/сумма</div></div>
+    </div>
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <div class="node check"><div class="label">Проверка на дубликат</div><div class="detail">Поиск другого чека с теми же ФН + ФД + ФП (исключая текущий)</div></div>
+    </div>
+
+    <div class="two-col" style="margin-top:4px;">
+      <div class="col">
+        <div class="branch-label">Дубликат найден</div>
+        <div class="connector"></div>
+        <div class="node bad" style="width:100%;"><div class="label">REJECTED</div><div class="detail">«Такой чек уже зарегистрирован в акции»<br>+ письмо участнику</div></div>
+      </div>
+      <div class="col">
+        <div class="branch-label">Не дубликат</div>
+        <div class="connector"></div>
+        <div class="node action" style="width:100%;"><div class="label">Запрос в ФНС</div><div class="detail">SOAP через прокси → JSON с товарами, датой, суммой, ИНН, адресом</div></div>
+      </div>
+    </div>
+
+    <div class="arrow-down" style="margin-left:280px;">↓</div>
+
+    <div class="flow-row" style="margin-left:0;">
+      <div class="node check"><div class="label">Проверка даты чека</div><div class="detail">Дата из ФНС ≥ дата начала акции И ≤ дата окончания акции?</div></div>
+    </div>
+
+    <div class="two-col" style="margin-top:4px;">
+      <div class="col">
+        <div class="branch-label">Нет</div>
+        <div class="connector"></div>
+        <div class="node bad" style="width:100%;"><div class="label">REJECTED</div><div class="detail">«Дата покупки не соответствует периоду акции»<br>+ письмо участнику</div></div>
+      </div>
+      <div class="col">
+        <div class="branch-label">Да</div>
+        <div class="connector"></div>
+        <div class="node check" style="width:100%;"><div class="label">Проверка магазина</div><div class="detail">ИНН чека ∈ таблица Store? Название магазина ∈ таблица Store?</div></div>
+      </div>
+    </div>
+
+    <div class="two-col right" style="margin-left:50%; margin-top:4px;">
+      <div class="col">
+        <div class="branch-label">Магазин не найден</div>
+        <div class="connector"></div>
+        <div class="node warn" style="width:100%;"><div class="label">PENDING</div><div class="detail">«Чек на проверке». Пишет в <code>system_message</code>: не найден ИНН или название. Уведомление в Telegram.</div></div>
+      </div>
+      <div class="col">
+        <div class="branch-label">Магазин найден</div>
+        <div class="connector"></div>
+        <div class="node action" style="width:100%;"><div class="label">→ Этап 2: валидация товаров</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Этап 2 — Три ветвления валидации товаров</h2>
+  <div class="note info" style="margin-bottom:12px;">Все три ветвления запускаются независимо. Keywords и RapidFuzz активны всегда; AI — отключён по умолчанию (<code>ai_mode=False</code>). Исключение в одном ветвлении не прерывает остальные.</div>
+
+  <div class="validators-row">
+    <div class="validator-block v-keywords">
+      <div class="v-label">① Keywords — точное совпадение</div>
+      <div class="v-detail">
+        Для каждого товара в чеке:<br>
+        1. Проверить исключающие ключевые слова (<code>excluding_keywords</code>) — если найдено, товар пропускается.<br>
+        2. Проверить имя продукта из БД (<code>product.name</code>) — подстрочный поиск в названии товара.<br>
+        3. Проверить ключевые слова продукта (<code>keywords</code>) — подстрочный поиск.<br>
+        Если продукт найден → проверить глобальное ключевое слово (<code>item_matches_global_keyword</code>).<br>
+        Если оба условия выполнены → <code>matched=True</code>, ранний выход.
+      </div>
+    </div>
+    <div class="validator-block v-rapidfuzz">
+      <div class="v-label">② RapidFuzz — нечёткое совпадение</div>
+      <div class="v-detail">
+        Для каждого товара строит комбинации <code>«бренд + ключевое слово»</code> из БД и сравнивает с названием товара через:<br>
+        • <code>WRatio ≥ 65</code><br>
+        • <code>partial_ratio ≥ 55</code><br>
+        Только если оба порога выполнены — совпадение.<br>
+        Дополнительный фильтр: название найденного продукта должно состоять более чем из одного слова.
+      </div>
+    </div>
+    <div class="validator-block v-ai">
+      <div class="v-label">③ AI (Gemini 2.5 Flash) — семантический анализ</div>
+      <div class="v-detail">
+        Отключён по умолчанию. При включении:<br>
+        Отправляет все товары чека + список акционных товаров + ключевые слова в OpenRouter (Gemini 2.5 Flash).<br>
+        AI проверяет совпадение бренда И продукта одновременно.<br>
+        Возвращает <code>{"matches": true/false}</code>.<br>
+        Не возвращает конкретные позиции товаров.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Этап 3 — Итоговый статус по результатам ValidationResult</h2>
+
+  <div class="note" style="margin-bottom:12px;">
+    <code>all_true</code> = все активные ветвления вернули True &nbsp;|&nbsp;
+    <code>all_false</code> = все вернули False &nbsp;|&nbsp;
+    <code>needs_manual_review</code> = смешанный результат (не всё True и не всё False)
+  </div>
+
+  <table class="result-table">
+    <thead>
+      <tr>
+        <th>Keywords</th>
+        <th>RapidFuzz</th>
+        <th>AI</th>
+        <th>Итог</th>
+        <th>Действие</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>✅ True</td>
+        <td>✅ True</td>
+        <td>— (выкл.)</td>
+        <td><span class="badge confirmed">CONFIRMED</span></td>
+        <td>Письмо «чек принят». Если первый подтверждённый — письмо с гарантированным призом. Сохраняется <code>moderated_at</code>.</td>
+      </tr>
+      <tr>
+        <td>✅ True</td>
+        <td>❌ False</td>
+        <td>— (выкл.)</td>
+        <td><span class="badge pending">PENDING</span></td>
+        <td>Смешанный результат → ручная проверка администратором. Пишет детали в <code>system_message</code>. Уведомление в Telegram.</td>
+      </tr>
+      <tr>
+        <td>❌ False</td>
+        <td>✅ True</td>
+        <td>— (выкл.)</td>
+        <td><span class="badge pending">PENDING</span></td>
+        <td>Смешанный результат → ручная проверка. Уведомление в Telegram.</td>
+      </tr>
+      <tr>
+        <td>❌ False</td>
+        <td>❌ False</td>
+        <td>— (выкл.)</td>
+        <td><span class="badge pending">PENDING</span></td>
+        <td>Все ветвления отказали → всё равно ручная проверка (не авто-REJECTED). Уведомление в Telegram.</td>
+      </tr>
+      <tr>
+        <td>✅ True</td>
+        <td>✅ True</td>
+        <td>✅ True</td>
+        <td><span class="badge confirmed">CONFIRMED</span></td>
+        <td>Все три ветвления подтвердили.</td>
+      </tr>
+      <tr>
+        <td colspan="3" style="color:#888; font-size:11px;">Любой смешанный при включённом AI</td>
+        <td><span class="badge pending">PENDING</span></td>
+        <td>Ручная проверка администратором.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    ⚠️ Авто-REJECTED по результату валидации товаров не применяется ни при каком раскладе — даже если все три ветвления вернули False. Чек уходит в PENDING на ручную проверку.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Ручная модерация в админке</h2>
+
+  <div class="flow">
+    <div class="flow-row">
+      <div class="node warn" style="max-width:260px;"><div class="label">Чек в PENDING</div><div class="detail">Администратор меняет статус вручную</div></div>
+    </div>
+    <div class="two-col" style="margin-top:8px; max-width:540px;">
+      <div class="col">
+        <div class="branch-label">→ CONFIRMED</div>
+        <div class="connector"></div>
+        <div class="node ok" style="width:100%;"><div class="label">CONFIRMED</div><div class="detail">Проставляется неделя розыгрыша и <code>moderated_at</code>. Письмо «чек принят». Если первый — гарантированный приз.</div></div>
+      </div>
+      <div class="col">
+        <div class="branch-label">→ REJECTED</div>
+        <div class="connector"></div>
+        <div class="node bad" style="width:100%;"><div class="label">REJECTED</div><div class="detail">Проставляется <code>moderated_at</code>. Письмо «чек отклонён».</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Риски</h2>
+  <table class="risk-table">
+    <thead>
+      <tr>
+        <th style="width:28px;">#</th>
+        <th style="width:80px;">Серьёз.</th>
+        <th>Проблема</th>
+        <th>Пример</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><span class="sev high">Высокий</span></td>
+        <td>Исключающие ключевые слова проверяются до ключевых слов бренда. Если название продукта акции содержит исключающее слово — он будет пропущен, даже если это акционный товар.</td>
+        <td>Продукт с <code>excluding_keyword</code> «перепелиные» при названии «Яйцо Атемарское Отборное» — товар пропустится.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><span class="sev high">Высокий</span></td>
+        <td>ФНС обрезает названия товаров до 64 символов. Ключевое слово может быть обрезано в середине.</td>
+        <td><code>Яйцо куриное Атемарская Ферма отборн</code> — «отборное» обрезано, если оно было ключевым словом.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><span class="sev high">Высокий</span></td>
+        <td>Все ветвления False → всё равно PENDING, не REJECTED. Администратор проверяет вручную чеки без акционных товаров.</td>
+        <td>Чек из кафе с продуктами — очевидно не акционный товар, но уходит на ручную проверку.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><span class="sev med">Средний</span></td>
+        <td>RapidFuzz требует многословный результат (более одного слова в найденном продукте). Короткие названия продуктов могут не проходить фильтр.</td>
+        <td>Если <code>product.name</code> = «Яйцо» (одно слово) — RapidFuzz его отфильтрует.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><span class="sev med">Средний</span></td>
+        <td>AI-ветвление отключено по умолчанию (<code>ai_mode=False</code>). Смешанные результаты keywords/rapidfuzz не разрешаются автоматически.</td>
+        <td>Keywords=False, RapidFuzz=True → PENDING вместо возможного CONFIRMED через AI.</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><span class="sev low">Низкий</span></td>
+        <td>AI не возвращает конкретные позиции товаров — только True/False. При CONFIRMED через AI поле <code>promo_items</code> останется пустым.</td>
+        <td>В аналитике не будет видно, какой именно товар подтвердил AI.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <h2>Предложения</h2>
+  <div class="proposals">
+    <div class="proposal p-warn">
+      <div class="p-tag tag-todo">Требует решения</div>
+      <div class="p-title">Авто-REJECTED при all_false</div>
+      <div class="p-body">Когда все ветвления вернули False — отклонять автоматически вместо ручной проверки. Требует предварительного решения с исключающими ключевыми словами (риск №1), чтобы не отклонять валидные чеки.</div>
+    </div>
+    <div class="proposal p-warn">
+      <div class="p-tag tag-todo">Требует решения</div>
+      <div class="p-title">Порядок проверки: бренд перед exclude</div>
+      <div class="p-body">Если товар уже совпал с <code>product.name</code> — исключающие ключевые слова не должны его блокировать. Нужно уточнить бизнес-правило: исключаются ли акционные товары, содержащие стоп-слово.</div>
+    </div>
+    <div class="proposal p-blue">
+      <div class="p-tag tag-idea">Идея</div>
+      <div class="p-title">Включить AI для разрешения смешанных результатов</div>
+      <div class="p-body">Когда <code>needs_manual_review=True</code> (keywords ≠ rapidfuzz) — автоматически запускать AI-ветвление. Если AI подтверждает → CONFIRMED, если нет → PENDING. Сократит количество чеков на ручную проверку.</div>
+    </div>
+    <div class="proposal p-green">
+      <div class="p-tag tag-idea">Идея</div>
+      <div class="p-title">Повторная обработка PENDING-чеков при обновлении ключевых слов</div>
+      <div class="p-body">При добавлении новых ключевых слов в БД — запускать переобработку чеков в PENDING через Celery-задачу. Позволит автоматически подтвердить чеки, которые не прошли из-за неполного словаря.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

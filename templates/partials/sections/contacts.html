@@ -1,0 +1,14 @@
+{% with block=blocks.contacts %}
+{% if block %}
+<section class="section section--accent" id="contacts">
+    <div class="container contacts">
+        <div>
+            <h2 class="section__title">{{ block.title|default:"Остались вопросы?" }}</h2>
+            {% if block.subtitle %}<p class="section__subtitle">{{ block.subtitle }}</p>{% endif %}
+            {% if block.body %}<div class="section__note">{{ block.body|linebreaks }}</div>{% endif %}
+        </div>
+        <a class="button button--primary" href="mailto:{{ company_info.email }}">{{ company_info.email }}</a>
+    </div>
+</section>
+{% endif %}
+{% endwith %}

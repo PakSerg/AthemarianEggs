@@ -1,0 +1,66 @@
+/**
+ * Токены оформления Акции «Купи и выиграй с Атемарской».
+ *
+ * Единственное место, где живут цвета, шрифты, радиусы и отступы. В шаблонах и
+ * остальных стилях фирменных значений нет — когда приедет брендбук
+ * (бриф, п. 12), правится только этот файл.
+ *
+ * Палитра выбрана «по смыслу» продукта: тёплый яичный жёлтый как акцент,
+ * глубокий зелёный птицефабрики как контраст, кремовый фон. Это заглушка до
+ * фирменных цветов, а не дизайн-решение.
+ */
+:root {
+    /* Бренд */
+    --color-accent: #F2B705;
+    --color-accent-dark: #D89E00;
+    --color-accent-soft: #FFF3D1;
+    --color-brand: #1F6B3B;
+    --color-brand-dark: #14522C;
+
+    /* Поверхности */
+    --color-bg: #FFFDF7;
+    --color-surface: #FFFFFF;
+    --color-surface-muted: #F6F1E4;
+    --color-border: #E7DFCC;
+
+    /* Текст */
+    --color-text: #1C1A16;
+    --color-text-muted: #6B6558;
+    --color-text-inverse: #FFFFFF;
+
+    /* Состояния */
+    --color-success: #2F9E44;
+    --color-danger: #E03131;
+
+    /* Типографика */
+    --font-base: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-display: var(--font-base);
+
+    --text-xs: 13px;
+    --text-sm: 15px;
+    --text-md: 17px;
+    --text-lg: 22px;
+    --text-xl: 30px;
+    --text-2xl: 42px;
+
+    /* Раскладка */
+    --container-width: 1200px;
+    --container-gutter: 16px;
+    --section-gap: 72px;
+
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 28px;
+
+    --shadow-card: 0 8px 28px rgba(28, 26, 22, 0.08);
+    --shadow-modal: 0 24px 64px rgba(28, 26, 22, 0.24);
+}
+
+@media (max-width: 767px) {
+    :root {
+        --text-2xl: 30px;
+        --text-xl: 24px;
+        --text-lg: 19px;
+        --section-gap: 48px;
+    }
+}
